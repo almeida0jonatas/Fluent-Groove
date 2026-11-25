@@ -1,0 +1,258 @@
+<resources>
+    <string name="app_name">Fluent Groove</string>
+
+    <!-- Navigation -->
+    <string name="nav_my_music">Mi Música</string>
+    <string name="nav_recent_plays">Recientes</string>
+    <string name="nav_now_playing">Reproduciendo</string>
+    <string name="nav_playlists">Listas</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Tabs & Search -->
+    <string name="tab_home">Inicio</string>
+    <string name="tab_songs">Canciones</string>
+    <string name="tab_artists">Artistas</string>
+    <string name="tab_albums">Álbumes</string>
+    <string name="filter_all">Todo</string>
+    <string name="search_placeholder">Buscar canciones, álbumes, artistas</string>
+    <string name="search_no_results">Sin resultados para \"%1$s\"</string>
+    <string name="search_no_results_hint">Prueba con otro título, artista o álbum.</string>
+    <string name="search_clear">Borrar búsqueda</string>
+
+    <!-- Sort Orders -->
+    <string name="sort_by_prefix">Ordenar: %1$s</string>
+    <string name="sort_date_added">Agregadas recientemente</string>
+    <string name="sort_title">A a Z</string>
+    <string name="sort_artist">Artista</string>
+    <string name="sort_album">Álbum</string>
+
+    <!-- Common Actions -->
+    <string name="action_play">Reproducir</string>
+    <string name="action_pause">Pausar</string>
+    <string name="action_play_all">Reproducir todo</string>
+    <string name="action_play_now">Reproducir ahora</string>
+    <string name="action_shuffle">Aleatorio</string>
+    <string name="action_shuffle_all">Reproducir en aleatorio</string>
+    <string name="action_shuffle_all_count">Aleatorio (%1$d)</string>
+    <string name="action_queue">Cola</string>
+    <string name="action_add_to_queue">Añadir a la cola</string>
+    <string name="action_add_to_playlist">Añadir a una lista</string>
+    <string name="action_go_to_album">Ir al álbum</string>
+    <string name="action_go_to_artist">Ir al artista</string>
+    <string name="action_remove_from_playlist">Quitar de la lista</string>
+    <string name="action_new_playlist">Nueva lista</string>
+    <string name="action_create">Crear</string>
+    <string name="action_create_and_add">Crear y añadir</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_clear">Limpiar</string>
+    <string name="action_clear_all">Limpiar todo</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_rename">Renombrar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_retry">Reintentar</string>
+    <string name="action_see_all">Ver todo</string>
+    <string name="action_all_songs">Todas las canciones</string>
+    <string name="action_import_files">Importar archivos de audio</string>
+    <string name="action_import_files_short">Importar archivos</string>
+    <string name="action_import_folder">Importar carpeta de música</string>
+    <string name="action_import_folder_short">Importar carpeta</string>
+    <string name="action_load_demo">Cargar pista demo</string>
+    <string name="action_add_demo">Añadir pista demo</string>
+    <string name="action_clear_library">Limpiar biblioteca</string>
+
+    <!-- Counts & Relative Time -->
+    <plurals name="song_count">
+        <item quantity="one">%1$d canción</item>
+        <item quantity="other">%1$d canciones</item>
+    </plurals>
+    <plurals name="album_count">
+        <item quantity="one">%1$d álbum</item>
+        <item quantity="other">%1$d álbumes</item>
+    </plurals>
+    <plurals name="artist_count">
+        <item quantity="one">%1$d artista</item>
+        <item quantity="other">%1$d artistas</item>
+    </plurals>
+    <plurals name="play_count">
+        <item quantity="one">%1$d reproducción</item>
+        <item quantity="other">%1$d reproducciones</item>
+    </plurals>
+    <string name="time_just_now">Ahora</string>
+    <string name="time_minutes_ago">hace %1$dm</string>
+    <string name="time_hours_ago">hace %1$dh</string>
+    <string name="time_days_ago">hace %1$dd</string>
+    <string name="time_weeks_ago">hace %1$dsem</string>
+
+    <!-- Home Tab -->
+    <string name="home_quick_access">Acceso rápido</string>
+    <string name="home_top_most_played">8 más escuchadas</string>
+    <string name="home_top_most_played_empty">Reproduce canciones para crear tu lista de las 8 más escuchadas.</string>
+    <string name="home_recently_played">Escuchadas recientemente</string>
+    <string name="home_recently_played_empty">Las canciones que escuches aparecerán aquí.</string>
+    <string name="home_recently_added">Agregadas recientemente</string>
+    <string name="label_album_tag">Álbum</string>
+    <string name="label_artist_tag">Artista</string>
+    <string name="label_song_tag">Canción</string>
+
+    <!-- My Music Empty & Importing -->
+    <string name="importing_files">Analizando y organizando %1$d archivos de audio…</string>
+    <string name="importing_folder">Analizando carpeta de música y leyendo etiquetas…</string>
+    <string name="empty_library_title">Tu colección de música está vacía</string>
+    <string name="empty_library_subtitle">Importa archivos MP3, FLAC, M4A, WAV u OGG. Fluent Groove lee automáticamente etiquetas, carátulas y fotos de artistas.</string>
+
+    <!-- Recent Plays -->
+    <string name="recent_plays_subtitle">Tu historial de reproducción en este dispositivo</string>
+    <string name="recent_plays_empty_title">Sin reproducciones recientes</string>
+    <string name="recent_plays_empty_subtitle">Las canciones y álbumes que escuches aparecerán aquí.</string>
+    <string name="recent_albums">Álbumes recientes</string>
+    <string name="recent_played_songs">Canciones recientes</string>
+
+    <!-- Now Playing & Mini Player & Player Bar -->
+    <string name="not_playing">Sin reproducción</string>
+    <string name="nothing_playing">Nada se está reproduciendo</string>
+    <string name="nothing_playing_subtitle">Elige una canción, álbum o lista en Mi Música para comenzar.</string>
+    <string name="import_music_to_begin">Importa música para empezar</string>
+    <string name="select_song_to_play">Selecciona una canción</string>
+    <string name="mini_player_label">MINI REPRODUCTOR</string>
+    <string name="mini_player_empty_title">Sin reproducción</string>
+    <string name="mini_player_empty_subtitle">Restaura la vista para importar canciones</string>
+    <string name="play_queue_count">Cola de reproducción (%1$d)</string>
+    <string name="save_queue_title">Guardar cola como lista</string>
+    <string name="save_queue_default_name">Cola de reproducción</string>
+
+    <!-- Lyrics -->
+    <string name="lyrics_label">Letras</string>
+    <string name="lyrics_synced_source">Sincronizada • %1$s</string>
+    <string name="lyrics_plain_source">Letra • %1$s</string>
+    <string name="lyrics_instrumental_source">Instrumental • %1$s</string>
+    <string name="lyrics_searching">Buscando…</string>
+    <string name="lyrics_searching_synced">Buscando letra sincronizada…</string>
+    <string name="lyrics_idle_title">Reproduce una canción para ver la letra</string>
+    <string name="lyrics_idle_subtitle">Las letras sincronizadas se cargan automáticamente cuando están disponibles.</string>
+    <string name="lyrics_not_found_title">Letra no encontrada</string>
+    <string name="lyrics_not_found_subtitle">No encontramos la letra en línea. Puedes reintentar o importar un archivo .lrc local.</string>
+    <string name="lyrics_error_title">No se pudo cargar la letra</string>
+    <string name="lyrics_error_subtitle">Revisa tu conexión e inténtalo de nuevo, o importa un archivo .lrc local.</string>
+    <string name="lyrics_fallback_empty_subtitle">Puedes actualizar o importar un archivo .lrc local.</string>
+    <string name="lyrics_instrumental_title">Instrumental</string>
+    <string name="lyrics_instrumental_subtitle">Disfruta la música — esta pista no tiene voz.</string>
+    <string name="lyrics_unsynced_notice">Sincronización no disponible para esta pista — mostrando la letra completa.</string>
+    <string name="lyrics_tap_to_seek">Toca cualquier verso para saltar a ese momento</string>
+    <string name="lyrics_sync_button">Sincronizar</string>
+    <string name="lyrics_import_lrc">Importar .lrc</string>
+
+    <!-- Playlists & Dialogs -->
+    <string name="playlist_badge">LISTA</string>
+    <string name="playlist_name_placeholder">Nombre de la lista</string>
+    <string name="playlist_create_new">Crear nueva lista</string>
+    <string name="playlist_none_yet">Aún no hay listas.</string>
+    <string name="playlist_rename_title">Renombrar lista</string>
+    <string name="playlist_delete_title">¿Eliminar lista?</string>
+    <string name="playlist_delete_message">¿Eliminar \"%1$s\"? Tus archivos de música seguirán en Mi Música.</string>
+    <string name="playlist_empty_title">Esta lista aún no tiene canciones</string>
+    <string name="playlist_empty_subtitle">Usa el menú de opciones en cualquier canción o álbum para añadirla aquí.</string>
+    <string name="album_not_found">Álbum no encontrado.</string>
+    <string name="artist_not_found">Artista no encontrado.</string>
+    <string name="playlist_not_found">Lista no encontrada.</string>
+
+    <!-- Settings -->
+    <string name="settings_subtitle">Tema, color de énfasis, idioma, ecualizador y biblioteca local</string>
+    <string name="settings_section_theme">Tema y Color de Énfasis</string>
+    <string name="settings_app_theme">Tema de la aplicación</string>
+    <string name="settings_theme_auto">Automático</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_theme_desc_auto">Sigue automáticamente el tema claro u oscuro del sistema</string>
+    <string name="settings_theme_desc_light">Usar siempre la apariencia clara clásica de Groove</string>
+    <string name="settings_theme_desc_dark">Usar siempre la apariencia oscura de Fluent Groove</string>
+    <string name="settings_accent_color">Color de énfasis</string>
+    <string name="settings_section_language">Idioma</string>
+    <string name="settings_language_label">Idioma de la aplicación</string>
+    <string name="settings_language_system">Idioma del sistema</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_desc_system">Usa automáticamente el idioma de tu dispositivo</string>
+    <string name="settings_language_desc_english">Mostrar siempre la interfaz en inglés</string>
+    <string name="settings_section_acrylic">Acrílico Fluent e Interfaz</string>
+    <string name="settings_acrylic_density">Densidad acrílica de barra lateral y superior</string>
+    <string name="acrylic_subtle">Sutil</string>
+    <string name="acrylic_standard">Estándar</string>
+    <string name="acrylic_dense">Denso</string>
+    <string name="settings_show_top_bar">Mostrar barra acrílica superior</string>
+    <string name="settings_show_top_bar_desc">Mostrar encabezado superior en pantallas anchas</string>
+    <string name="settings_section_eq">Ecualizador de Audio</string>
+    <string name="settings_eq_preset">Preajuste</string>
+    <string name="eq_flat">Plano</string>
+    <string name="eq_warm">Cálido</string>
+    <string name="eq_bass_boost">Graves</string>
+    <string name="eq_vocal">Vocal</string>
+    <string name="eq_electronic">Electrónica</string>
+    <string name="eq_custom">Personalizado</string>
+    <string name="eq_band_low">Graves (Low)</string>
+    <string name="eq_band_mid">Medios (Vocal)</string>
+    <string name="eq_band_high">Agudos (High)</string>
+    <string name="settings_section_library">Biblioteca de Música</string>
+    <string name="settings_clear_library_title">¿Limpiar biblioteca de música?</string>
+    <string name="settings_clear_library_message">Esto elimina todas las pistas importadas, historial y listas personalizadas de Fluent Groove. Tus archivos originales no se borrarán.</string>
+
+    <!-- Accent Color Names -->
+    <string name="accent_blue">Azul Groove</string>
+    <string name="accent_orange">Naranja Groove</string>
+    <string name="accent_purple">Púrpura Iris</string>
+    <string name="accent_magenta">Rosa Orquídea</string>
+    <string name="accent_teal">Turquesa</string>
+    <string name="accent_emerald">Esmeralda</string>
+    <string name="accent_crimson">Carmesí</string>
+    <string name="accent_amber">Ámbar Dorado</string>
+
+    <!-- Toasts -->
+    <string name="toast_added_demo">Pista demo \"%1$s\" de %2$s añadida</string>
+    <string name="toast_no_audio_files">No se encontraron archivos de audio compatibles</string>
+    <string name="toast_no_audio_folder">No se encontraron archivos de audio en la carpeta</string>
+    <string name="toast_organized_summary">Organizado: %1$s (%2$s, %3$s)</string>
+    <string name="toast_added_to_queue">\"%1$s\" añadido a la cola</string>
+    <string name="toast_created_playlist">Lista \"%1$s\" creada</string>
+    <string name="toast_already_in_playlist">Ya está en \"%1$s\"</string>
+    <string name="toast_added_to_playlist">Añadido a \"%1$s\"</string>
+    <string name="toast_added_album_to_playlist">%1$d canciones añadidas a \"%2$s\"</string>
+    <string name="toast_renamed_playlist">Lista renombrada a \"%1$s\"</string>
+    <string name="toast_deleted_playlist">Lista eliminada</string>
+    <string name="toast_eq_preset">Ecualizador: %1$s</string>
+    <string name="toast_library_cleared">Biblioteca y listas limpiadas</string>
+    <string name="toast_synced_lyrics_imported">Letra sincronizada importada para \"%1$s\"</string>
+    <string name="toast_lyrics_imported">Letra importada para \"%1$s\"</string>
+    <string name="toast_lyrics_import_failed">No se pudo leer la letra del archivo seleccionado</string>
+    <string name="toast_playlist_custom_desc">Lista personalizada</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_open_menu">Abrir menú de navegación</string>
+    <string name="cd_search">Buscar en biblioteca</string>
+    <string name="cd_mini_player">Mini reproductor</string>
+    <string name="cd_restore_player">Restaurar vista completa</string>
+    <string name="cd_back">Volver</string>
+    <string name="cd_play">Reproducir</string>
+    <string name="cd_pause">Pausar</string>
+    <string name="cd_previous">Pista anterior</string>
+    <string name="cd_next">Pista siguiente</string>
+    <string name="cd_shuffle">Alternar aleatorio</string>
+    <string name="cd_repeat">Cambiar modo de repetición</string>
+    <string name="cd_mute">Silenciar</string>
+    <string name="cd_more_options">Más opciones</string>
+    <string name="cd_album_art">Carátula del álbum</string>
+    <string name="cd_artist_photo">Foto del artista</string>
+    <string name="cd_refresh_photo">Actualizar foto del artista</string>
+    <string name="cd_move_up">Subir pista</string>
+    <string name="cd_move_down">Bajar pista</string>
+    <string name="cd_remove_queue">Quitar de la cola</string>
+    <string name="cd_clear_search">Borrar búsqueda</string>
+    <string name="cd_lyrics">Mostrar letras</string>
+    <string name="cd_refresh_lyrics">Actualizar letras</string>
+    <string name="cd_import_lyrics">Importar archivo de letra LRC</string>
+    <string name="cd_expand_lyrics">Expandir letras</string>
+    <string name="cd_collapse_lyrics">Salir de pantalla completa</string>
+    <string name="cd_play_album">Reproducir álbum</string>
+    <string name="cd_play_artist">Reproducir artista</string>
+    <string name="cd_add_album_queue">Añadir álbum a la cola</string>
+    <string name="cd_open_queue">Mostrar cola de reproducción</string>
+    <string name="cd_close_queue">Ocultar cola de reproducción</string>
+</resources>

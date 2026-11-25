@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1800"
+    android:viewportHeight="1800">
+
+    <!-- Outer groove arc -->
+    <path
+        android:pathData="M949.5,619.4 A285,285 0 1,0 1180.7,850.5"
+        android:strokeWidth="56"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:type="linear"
+                android:startX="600"
+                android:startY="600"
+                android:endX="1200"
+                android:endY="1200"
+                android:startColor="#FFFF7A45"
+                android:centerColor="#FFB05FA8"
+                android:endColor="#FF5B5BF0" />
+        </aapt:attr>
+    </path>
+
+    <!-- Inner groove arc -->
+    <path
+        android:pathData="M867.9,1082.2 A185,185 0 1,0 717.8,932.1"
+        android:strokeWidth="56"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:type="linear"
+                android:startX="600"
+                android:startY="600"
+                android:endX="1200"
+                android:endY="1200"
+                android:startColor="#FFFF7A45"
+                android:centerColor="#FFB05FA8"
+                android:endColor="#FF5B5BF0" />
+        </aapt:attr>
+    </path>
+
+    <!-- Center core -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M900,815 A85,85 0 1,0 900,985 A85,85 0 1,0 900,815 Z" />
+</vector>

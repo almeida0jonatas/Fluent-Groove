@@ -1,0 +1,6 @@
+{
+  "name": "Fluent Groove",
+  "description": "Native Android music player faithfully styled after Windows 10 Groove Music with Fluent Acrylic UI, local audio library organization, playlists, queue management, automatic artist artwork, and native equalizer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

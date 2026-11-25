@@ -1,0 +1,258 @@
+<resources>
+    <string name="app_name">Fluent Groove</string>
+
+    <!-- Navigation -->
+    <string name="nav_my_music">My Music</string>
+    <string name="nav_recent_plays">Recent Plays</string>
+    <string name="nav_now_playing">Now Playing</string>
+    <string name="nav_playlists">Playlists</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Tabs & Search -->
+    <string name="tab_home">Home</string>
+    <string name="tab_songs">Songs</string>
+    <string name="tab_artists">Artists</string>
+    <string name="tab_albums">Albums</string>
+    <string name="filter_all">All</string>
+    <string name="search_placeholder">Search songs, albums, artists</string>
+    <string name="search_no_results">No results found for \"%1$s\"</string>
+    <string name="search_no_results_hint">Try a different song title, artist, or album name.</string>
+    <string name="search_clear">Clear search</string>
+
+    <!-- Sort Orders -->
+    <string name="sort_by_prefix">Sort by: %1$s</string>
+    <string name="sort_date_added">Date added</string>
+    <string name="sort_title">A to Z</string>
+    <string name="sort_artist">Artist</string>
+    <string name="sort_album">Album</string>
+
+    <!-- Common Actions -->
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_play_all">Play all</string>
+    <string name="action_play_now">Play now</string>
+    <string name="action_shuffle">Shuffle</string>
+    <string name="action_shuffle_all">Shuffle all</string>
+    <string name="action_shuffle_all_count">Shuffle all (%1$d)</string>
+    <string name="action_queue">Queue</string>
+    <string name="action_add_to_queue">Add to queue</string>
+    <string name="action_add_to_playlist">Add to playlist</string>
+    <string name="action_go_to_album">Go to album</string>
+    <string name="action_go_to_artist">Go to artist</string>
+    <string name="action_remove_from_playlist">Remove from playlist</string>
+    <string name="action_new_playlist">New playlist</string>
+    <string name="action_create">Create</string>
+    <string name="action_create_and_add">Create &amp; Add</string>
+    <string name="action_save">Save</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_clear_all">Clear all</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_see_all">See all</string>
+    <string name="action_all_songs">All songs</string>
+    <string name="action_import_files">Import audio files</string>
+    <string name="action_import_files_short">Import files</string>
+    <string name="action_import_folder">Import music folder</string>
+    <string name="action_import_folder_short">Import folder</string>
+    <string name="action_load_demo">Load demo track</string>
+    <string name="action_add_demo">Add demo track</string>
+    <string name="action_clear_library">Clear library</string>
+
+    <!-- Counts & Relative Time -->
+    <plurals name="song_count">
+        <item quantity="one">%1$d song</item>
+        <item quantity="other">%1$d songs</item>
+    </plurals>
+    <plurals name="album_count">
+        <item quantity="one">%1$d album</item>
+        <item quantity="other">%1$d albums</item>
+    </plurals>
+    <plurals name="artist_count">
+        <item quantity="one">%1$d artist</item>
+        <item quantity="other">%1$d artists</item>
+    </plurals>
+    <plurals name="play_count">
+        <item quantity="one">%1$d play</item>
+        <item quantity="other">%1$d plays</item>
+    </plurals>
+    <string name="time_just_now">Just now</string>
+    <string name="time_minutes_ago">%1$dm ago</string>
+    <string name="time_hours_ago">%1$dh ago</string>
+    <string name="time_days_ago">%1$dd ago</string>
+    <string name="time_weeks_ago">%1$dw ago</string>
+
+    <!-- Home Tab -->
+    <string name="home_quick_access">Quick access</string>
+    <string name="home_top_most_played">Top 8 most played</string>
+    <string name="home_top_most_played_empty">Play songs to build your Top 8 most played list.</string>
+    <string name="home_recently_played">Recently played</string>
+    <string name="home_recently_played_empty">Songs you listen to will appear here for quick replay.</string>
+    <string name="home_recently_added">Recently added</string>
+    <string name="label_album_tag">Album</string>
+    <string name="label_artist_tag">Artist</string>
+    <string name="label_song_tag">Song</string>
+
+    <!-- My Music Empty & Importing -->
+    <string name="importing_files">Scanning &amp; organizing %1$d audio files…</string>
+    <string name="importing_folder">Scanning music folder &amp; reading tags…</string>
+    <string name="empty_library_title">Your music collection is empty</string>
+    <string name="empty_library_subtitle">Import local MP3, FLAC, M4A, WAV, or OGG files. Fluent Groove automatically reads tags, album artwork, and artist portraits.</string>
+
+    <!-- Recent Plays -->
+    <string name="recent_plays_subtitle">Your listening history on this device</string>
+    <string name="recent_plays_empty_title">No recent plays yet</string>
+    <string name="recent_plays_empty_subtitle">Songs and albums you listen to will appear here.</string>
+    <string name="recent_albums">Recent albums</string>
+    <string name="recent_played_songs">Recently played songs</string>
+
+    <!-- Now Playing & Mini Player & Player Bar -->
+    <string name="not_playing">Not playing</string>
+    <string name="nothing_playing">Nothing is playing</string>
+    <string name="nothing_playing_subtitle">Pick a song, album, or playlist from My Music to start playing.</string>
+    <string name="import_music_to_begin">Import music to begin</string>
+    <string name="select_song_to_play">Select a song to play</string>
+    <string name="mini_player_label">MINI PLAYER</string>
+    <string name="mini_player_empty_title">Nothing playing</string>
+    <string name="mini_player_empty_subtitle">Restore view to import songs</string>
+    <string name="play_queue_count">Play queue (%1$d)</string>
+    <string name="save_queue_title">Save queue as playlist</string>
+    <string name="save_queue_default_name">Now Playing Queue</string>
+
+    <!-- Lyrics -->
+    <string name="lyrics_label">Lyrics</string>
+    <string name="lyrics_synced_source">Synced • %1$s</string>
+    <string name="lyrics_plain_source">Lyrics • %1$s</string>
+    <string name="lyrics_instrumental_source">Instrumental • %1$s</string>
+    <string name="lyrics_searching">Searching…</string>
+    <string name="lyrics_searching_synced">Searching synced lyrics…</string>
+    <string name="lyrics_idle_title">Play a song to see lyrics</string>
+    <string name="lyrics_idle_subtitle">Synchronized lyrics load automatically when available.</string>
+    <string name="lyrics_not_found_title">No lyrics found</string>
+    <string name="lyrics_not_found_subtitle">We couldn\'t find lyrics for this track online. You can try again or import a local .lrc file.</string>
+    <string name="lyrics_error_title">Unable to fetch lyrics</string>
+    <string name="lyrics_error_subtitle">Check your connection and try again, or load a local .lrc file.</string>
+    <string name="lyrics_fallback_empty_subtitle">You can try refreshing or import a local .lrc file.</string>
+    <string name="lyrics_instrumental_title">Instrumental</string>
+    <string name="lyrics_instrumental_subtitle">Enjoy the music — this track has no vocals.</string>
+    <string name="lyrics_unsynced_notice">Synced timing isn\'t available for this track — showing full lyrics.</string>
+    <string name="lyrics_tap_to_seek">Tap any line to jump to that moment</string>
+    <string name="lyrics_sync_button">Sync</string>
+    <string name="lyrics_import_lrc">Import .lrc</string>
+
+    <!-- Playlists & Dialogs -->
+    <string name="playlist_badge">PLAYLIST</string>
+    <string name="playlist_name_placeholder">Playlist name</string>
+    <string name="playlist_create_new">Create new playlist</string>
+    <string name="playlist_none_yet">No playlists yet.</string>
+    <string name="playlist_rename_title">Rename playlist</string>
+    <string name="playlist_delete_title">Delete playlist?</string>
+    <string name="playlist_delete_message">Delete \"%1$s\"? Your music files will remain in My Music.</string>
+    <string name="playlist_empty_title">This playlist has no songs yet</string>
+    <string name="playlist_empty_subtitle">Use the overflow menu on any song or album to add it here.</string>
+    <string name="album_not_found">Album not found.</string>
+    <string name="artist_not_found">Artist not found.</string>
+    <string name="playlist_not_found">Playlist not found.</string>
+
+    <!-- Settings -->
+    <string name="settings_subtitle">Theme, accent color, language, equalizer, and local music library</string>
+    <string name="settings_section_theme">Theme &amp; Accent Color</string>
+    <string name="settings_app_theme">App theme</string>
+    <string name="settings_theme_auto">Auto</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_desc_auto">Follows your device\'s light or dark system setting automatically</string>
+    <string name="settings_theme_desc_light">Always use the classic light Groove appearance</string>
+    <string name="settings_theme_desc_dark">Always use the dark Fluent Groove appearance</string>
+    <string name="settings_accent_color">Accent color</string>
+    <string name="settings_section_language">Language</string>
+    <string name="settings_language_label">App language</string>
+    <string name="settings_language_system">System default</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_desc_system">Automatically matches your device\'s system language</string>
+    <string name="settings_language_desc_english">Always display the interface in English</string>
+    <string name="settings_section_acrylic">Fluent Acrylic &amp; Interface</string>
+    <string name="settings_acrylic_density">Sidebar &amp; Header Acrylic Density</string>
+    <string name="acrylic_subtle">Subtle</string>
+    <string name="acrylic_standard">Standard</string>
+    <string name="acrylic_dense">Dense</string>
+    <string name="settings_show_top_bar">Show top acrylic bar</string>
+    <string name="settings_show_top_bar_desc">Display top navigation header on wide screens</string>
+    <string name="settings_section_eq">Audio Equalizer</string>
+    <string name="settings_eq_preset">Preset</string>
+    <string name="eq_flat">Flat</string>
+    <string name="eq_warm">Warm</string>
+    <string name="eq_bass_boost">Bass Boost</string>
+    <string name="eq_vocal">Vocal</string>
+    <string name="eq_electronic">Electronic</string>
+    <string name="eq_custom">Custom</string>
+    <string name="eq_band_low">Low (Bass)</string>
+    <string name="eq_band_mid">Mid (Vocals)</string>
+    <string name="eq_band_high">High (Treble)</string>
+    <string name="settings_section_library">Music Library</string>
+    <string name="settings_clear_library_title">Clear music library?</string>
+    <string name="settings_clear_library_message">This removes all imported tracks, recent plays, and custom playlists from Fluent Groove. Your original audio files on device storage are not deleted.</string>
+
+    <!-- Accent Color Names -->
+    <string name="accent_blue">Groove Blue</string>
+    <string name="accent_orange">Groove Orange</string>
+    <string name="accent_purple">Iris Purple</string>
+    <string name="accent_magenta">Orchid Pink</string>
+    <string name="accent_teal">Seafoam Teal</string>
+    <string name="accent_emerald">Emerald</string>
+    <string name="accent_crimson">Crimson</string>
+    <string name="accent_amber">Golden Amber</string>
+
+    <!-- Toasts -->
+    <string name="toast_added_demo">Added demo track \"%1$s\" by %2$s</string>
+    <string name="toast_no_audio_files">No supported audio files found</string>
+    <string name="toast_no_audio_folder">No supported audio files found in folder</string>
+    <string name="toast_organized_summary">Organized %1$s (%2$s, %3$s)</string>
+    <string name="toast_added_to_queue">Added \"%1$s\" to queue</string>
+    <string name="toast_created_playlist">Created playlist \"%1$s\"</string>
+    <string name="toast_already_in_playlist">Already in \"%1$s\"</string>
+    <string name="toast_added_to_playlist">Added to \"%1$s\"</string>
+    <string name="toast_added_album_to_playlist">Added %1$d songs to \"%2$s\"</string>
+    <string name="toast_renamed_playlist">Renamed playlist to \"%1$s\"</string>
+    <string name="toast_deleted_playlist">Playlist deleted</string>
+    <string name="toast_eq_preset">Equalizer: %1$s</string>
+    <string name="toast_library_cleared">Library &amp; playlists cleared</string>
+    <string name="toast_synced_lyrics_imported">Synced lyrics imported for \"%1$s\"</string>
+    <string name="toast_lyrics_imported">Lyrics imported for \"%1$s\"</string>
+    <string name="toast_lyrics_import_failed">Could not read lyrics from selected file</string>
+    <string name="toast_playlist_custom_desc">Custom playlist</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_open_menu">Open navigation menu</string>
+    <string name="cd_search">Search library</string>
+    <string name="cd_mini_player">Mini player</string>
+    <string name="cd_restore_player">Restore full view</string>
+    <string name="cd_back">Go back</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_previous">Previous track</string>
+    <string name="cd_next">Next track</string>
+    <string name="cd_shuffle">Toggle shuffle</string>
+    <string name="cd_repeat">Cycle repeat mode</string>
+    <string name="cd_mute">Toggle mute</string>
+    <string name="cd_more_options">More options</string>
+    <string name="cd_album_art">Album cover artwork</string>
+    <string name="cd_artist_photo">Artist photo</string>
+    <string name="cd_refresh_photo">Refresh artist photo</string>
+    <string name="cd_move_up">Move track up</string>
+    <string name="cd_move_down">Move track down</string>
+    <string name="cd_remove_queue">Remove from queue</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_lyrics">Show lyrics</string>
+    <string name="cd_refresh_lyrics">Refresh lyrics</string>
+    <string name="cd_import_lyrics">Import LRC lyrics file</string>
+    <string name="cd_expand_lyrics">Expand lyrics fullscreen</string>
+    <string name="cd_collapse_lyrics">Exit fullscreen lyrics</string>
+    <string name="cd_play_album">Play album</string>
+    <string name="cd_play_artist">Play artist</string>
+    <string name="cd_add_album_queue">Add album to queue</string>
+    <string name="cd_open_queue">Show play queue</string>
+    <string name="cd_close_queue">Hide play queue</string>
+</resources>
