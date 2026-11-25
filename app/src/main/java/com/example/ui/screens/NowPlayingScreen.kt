@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lyrics
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PictureInPictureAlt
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
@@ -65,6 +66,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -79,6 +81,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -367,6 +370,17 @@ fun NowPlayingScreen(
                         .weight(1f)
                         .padding(start = 10.dp),
                 )
+                IconButton(
+                    onClick = onEnterMiniPlayer,
+                    modifier = Modifier.testTag("np_mini_player_button"),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.PictureInPictureAlt,
+                        contentDescription = stringResource(R.string.cd_mini_player),
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
                 if (currentTrack != null) {
                     IconButton(
                         onClick = { isFullscreenLyrics = true },
@@ -614,7 +628,7 @@ fun NowPlayingScreen(
 
                 Box {
                     IconButton(
-                        onClick = { overflowMenuExpanded = true },
+                        onClick = { if (currentTrack != null) overflowMenuExpanded = true },
                         modifier = Modifier
                             .size(48.dp)
                             .testTag("np_more_options_button"),
@@ -661,13 +675,6 @@ fun NowPlayingScreen(
                                 },
                             )
                         }
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.cd_mini_player)) },
-                            onClick = {
-                                overflowMenuExpanded = false
-                                onEnterMiniPlayer()
-                            },
-                        )
                     }
                 }
             }
@@ -817,6 +824,15 @@ private fun FullscreenLyricsStage(
     onOpenArtist: (String) -> Unit,
     onExitFullscreen: () -> Unit,
 ) {
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val previousKeepScreenOn = view.keepScreenOn
+        view.keepScreenOn = true
+        onDispose {
+            view.keepScreenOn = previousKeepScreenOn
+        }
+    }
+
     val bgStart = Color(currentTrack.artDesign.colorStart).copy(alpha = 0.85f)
     val bgEnd = FgDarkBackdrop
     val totalDur = durationSeconds.coerceAtLeast(currentTrack.duration).coerceAtLeast(1)
