@@ -11,6 +11,7 @@ import com.example.model.AppLanguage
 import com.example.model.AppThemeMode
 import com.example.model.EqualizerPresetName
 import com.example.model.MyMusicTab
+import com.example.model.NowPlayingArtworkStyle
 import com.example.model.SongSortOrder
 
 @StringRes
@@ -24,6 +25,12 @@ fun AppThemeMode.labelRes(): Int = when (this) {
 fun AppLanguage.labelRes(): Int = when (this) {
     AppLanguage.SYSTEM -> R.string.settings_language_system
     AppLanguage.ENGLISH -> R.string.settings_language_english
+}
+
+@StringRes
+fun NowPlayingArtworkStyle.labelRes(): Int = when (this) {
+    NowPlayingArtworkStyle.ARTIST_FULLSCREEN -> R.string.settings_player_art_artist_fullscreen
+    NowPlayingArtworkStyle.ALBUM_ART_NORMAL -> R.string.settings_player_art_album_normal
 }
 
 @StringRes

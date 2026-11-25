@@ -15,6 +15,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -72,8 +73,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -86,6 +89,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.R
 import com.example.model.LyricsUiState
+import com.example.model.NowPlayingArtworkStyle
 import com.example.model.RepeatMode
 import com.example.model.Track
 import com.example.model.formatDuration
@@ -108,6 +112,7 @@ import com.example.ui.theme.TabularNumStyle
 fun NowPlayingScreen(
     currentTrack: Track?,
     artistImageUrl: String?,
+    artworkStyle: NowPlayingArtworkStyle = NowPlayingArtworkStyle.ARTIST_FULLSCREEN,
     isPlaying: Boolean,
     elapsedSeconds: Int,
     elapsedMs: Long,
@@ -265,116 +270,158 @@ fun NowPlayingScreen(
             .fillMaxSize()
             .background(FgDarkBackdrop),
     ) {
-        // 1. Full-bleed edge-to-edge backdrop (artist portrait with album artwork fallback)
-        NowPlayingBackdrop(
-            currentTrack = currentTrack,
-            artistImageUrl = artistImageUrl,
-            modifier = Modifier.fillMaxSize(),
-        )
-
-        // 2. Top atmospheric scrim for crisp overlay header
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(136.dp)
-                .align(Alignment.TopCenter)
-                .background(
-                    Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.0f to Color.Black.copy(alpha = 0.56f),
-                            0.55f to Color.Black.copy(alpha = 0.22f),
-                            1.0f to Color.Transparent,
-                        )
-                    )
-                ),
-        )
-
-        // 3. Bottom atmospheric scrim for crisp metadata, seekbar, transport & queue arrow
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.56f)
-                .align(Alignment.BottomCenter)
-                .background(
-                    Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.0f to Color.Transparent,
-                            0.30f to Color.Black.copy(alpha = 0.26f),
-                            0.58f to Color.Black.copy(alpha = 0.64f),
-                            0.84f to Color.Black.copy(alpha = 0.84f),
-                            1.0f to Color.Black.copy(alpha = 0.92f),
-                        )
-                    )
-                ),
-        )
-
-        // 4. Transparent Overlay Top Bar: Back Arrow + "Now playing" + Lyrics Icon
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(horizontal = 4.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.testTag("np_back_button"),
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.cd_back),
-                    tint = Color.White,
-                    modifier = Modifier.size(25.dp),
-                )
-            }
-            Text(
-                text = stringResource(R.string.nav_now_playing),
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = 21.sp,
-                    fontWeight = FontWeight.Normal,
-                ),
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 10.dp),
+        if (artworkStyle == NowPlayingArtworkStyle.ARTIST_FULLSCREEN) {
+            // 1. Full-bleed edge-to-edge backdrop (artist portrait with album artwork fallback)
+            NowPlayingBackdrop(
+                currentTrack = currentTrack,
+                artistImageUrl = artistImageUrl,
+                modifier = Modifier.fillMaxSize(),
             )
-            if (currentTrack != null) {
-                IconButton(
-                    onClick = { isFullscreenLyrics = true },
-                    modifier = Modifier.testTag("np_lyrics_button"),
-                ) {
-                    Box(contentAlignment = Alignment.TopEnd) {
-                        Icon(
-                            imageVector = Icons.Filled.Lyrics,
-                            contentDescription = stringResource(R.string.cd_lyrics),
-                            tint = Color.White,
-                            modifier = Modifier.size(23.dp),
-                        )
-                        if (hasSyncedLyrics) {
-                            Box(
-                                modifier = Modifier
-                                    .size(7.dp)
-                                    .clip(CircleShape)
-                                    .background(FgAccentOnDark),
+
+            // 2. Top atmospheric scrim for crisp overlay header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(136.dp)
+                    .align(Alignment.TopCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colorStops = arrayOf(
+                                0.0f to Color.Black.copy(alpha = 0.56f),
+                                0.55f to Color.Black.copy(alpha = 0.22f),
+                                1.0f to Color.Transparent,
                             )
+                        )
+                    ),
+            )
+
+            // 3. Bottom atmospheric scrim for crisp metadata, seekbar, transport & queue arrow
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.56f)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colorStops = arrayOf(
+                                0.0f to Color.Transparent,
+                                0.30f to Color.Black.copy(alpha = 0.26f),
+                                0.58f to Color.Black.copy(alpha = 0.64f),
+                                0.84f to Color.Black.copy(alpha = 0.84f),
+                                1.0f to Color.Black.copy(alpha = 0.92f),
+                            )
+                        )
+                    ),
+            )
+        } else {
+            // Atmospheric ambient backdrop tinted from the current album palette
+            val artStart = currentTrack?.artDesign?.colorStart?.let { Color(it).copy(alpha = 0.68f) } ?: FgDarkBackdrop
+            val artEnd = currentTrack?.artDesign?.colorEnd?.let { Color(it).copy(alpha = 0.42f) } ?: FgDarkBackdrop
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colorStops = arrayOf(
+                                0.0f to artStart,
+                                0.45f to artEnd,
+                                0.78f to FgDarkBackdrop,
+                                1.0f to Color.Black.copy(alpha = 0.94f),
+                            )
+                        )
+                    ),
+            )
+        }
+
+        // Foreground layout: Top Bar + Center Artwork Stage + Bottom Controls Deck
+        Column(modifier = Modifier.fillMaxSize()) {
+            // 4. Transparent Overlay Top Bar: Back Arrow + "Now playing" + Lyrics Icon
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(horizontal = 4.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier.testTag("np_back_button"),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_back),
+                        tint = Color.White,
+                        modifier = Modifier.size(25.dp),
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.nav_now_playing),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 21.sp,
+                        fontWeight = FontWeight.Normal,
+                    ),
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 10.dp),
+                )
+                if (currentTrack != null) {
+                    IconButton(
+                        onClick = { isFullscreenLyrics = true },
+                        modifier = Modifier.testTag("np_lyrics_button"),
+                    ) {
+                        Box(contentAlignment = Alignment.TopEnd) {
+                            Icon(
+                                imageVector = Icons.Filled.Lyrics,
+                                contentDescription = stringResource(R.string.cd_lyrics),
+                                tint = Color.White,
+                                modifier = Modifier.size(23.dp),
+                            )
+                            if (hasSyncedLyrics) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(7.dp)
+                                        .clip(CircleShape)
+                                        .background(FgAccentOnDark),
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
 
-        // 5. Bottom Controls Deck matching Groove Music Android screenshot
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .widthIn(max = 600.dp)
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(horizontal = 16.dp),
-        ) {
+            // Center artwork stage (transparent in fullscreen artist mode; crisp centered album cover in normal mode)
+            BoxWithConstraints(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (artworkStyle == NowPlayingArtworkStyle.ALBUM_ART_NORMAL && currentTrack != null) {
+                    val artSize = minOf(maxWidth - 64.dp, maxHeight - 32.dp, 320.dp).coerceAtLeast(156.dp)
+                    AlbumArtwork(
+                        coverUri = currentTrack.coverUri,
+                        artDesign = currentTrack.artDesign,
+                        modifier = Modifier
+                            .size(artSize)
+                            .shadow(20.dp, RectangleShape)
+                            .border(1.dp, Color.White.copy(alpha = 0.16f))
+                            .testTag("np_album_artwork_card"),
+                    )
+                }
+            }
+
+            // 5. Bottom Controls Deck matching Groove Music Android screenshot
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp),
+            ) {
             // Track Title (left-aligned, large crisp white)
             Text(
                 text = currentTrack?.title ?: stringResource(R.string.not_playing),
@@ -641,12 +688,13 @@ fun NowPlayingScreen(
                     .testTag("np_open_queue_button"),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp,
-                    contentDescription = stringResource(R.string.cd_open_queue),
-                    tint = Color.White.copy(alpha = 0.92f),
-                    modifier = Modifier.size(26.dp),
-                )
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = stringResource(R.string.cd_open_queue),
+                        tint = Color.White.copy(alpha = 0.92f),
+                        modifier = Modifier.size(26.dp),
+                    )
+                }
             }
         }
 

@@ -173,6 +173,12 @@
     <string name="settings_language_english">English</string>
     <string name="settings_language_desc_system">Usa automaticamente o idioma configurado no dispositivo</string>
     <string name="settings_language_desc_english">Exibir sempre a interface em inglês</string>
+    <string name="settings_section_now_playing">Reproduzindo Agora</string>
+    <string name="settings_player_art_label">Visual do player principal</string>
+    <string name="settings_player_art_artist_fullscreen">Artista em tela cheia</string>
+    <string name="settings_player_art_album_normal">Arte do álbum</string>
+    <string name="settings_player_art_desc_artist">Exibe a foto do artista em tela cheia no fundo do player principal</string>
+    <string name="settings_player_art_desc_album">Exibe a arte do álbum em tamanho normal centralizada sobre um fundo atmosférico</string>
     <string name="settings_section_acrylic">Acrílico Fluent e Interface</string>
     <string name="settings_acrylic_density">Densidade acrílica da barra lateral e topo</string>
     <string name="acrylic_subtle">Sutil</string>

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -50,6 +51,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
@@ -59,6 +62,7 @@ import com.example.model.AppLanguage
 import com.example.model.AppThemeMode
 import com.example.model.EqualizerGains
 import com.example.model.EqualizerPresetName
+import com.example.model.NowPlayingArtworkStyle
 import com.example.ui.components.ConfirmDangerDialog
 import com.example.ui.labelRes
 import com.example.ui.theme.FgBorder
@@ -77,6 +81,7 @@ fun SettingsScreen(
     themeMode: AppThemeMode,
     accentColor: AccentColorOption,
     appLanguage: AppLanguage,
+    nowPlayingArtworkStyle: NowPlayingArtworkStyle,
     acrylicDensity: AcrylicDensity,
     eqPreset: EqualizerPresetName,
     eqGains: EqualizerGains,
@@ -87,6 +92,7 @@ fun SettingsScreen(
     onChangeThemeMode: (AppThemeMode) -> Unit,
     onChangeAccentColor: (AccentColorOption) -> Unit,
     onChangeAppLanguage: (AppLanguage) -> Unit,
+    onChangeNowPlayingArtworkStyle: (NowPlayingArtworkStyle) -> Unit,
     onChangeAcrylicDensity: (AcrylicDensity) -> Unit,
     onSelectEqPreset: (EqualizerPresetName) -> Unit,
     onChangeEqGains: (EqualizerGains) -> Unit,
@@ -242,7 +248,57 @@ fun SettingsScreen(
             }
         }
 
-        // Section 2: Language
+        // Section 2: Now Playing Player Artwork Style
+        item {
+            SettingsSection(title = stringResource(R.string.settings_section_now_playing)) {
+                Text(
+                    text = stringResource(R.string.settings_player_art_label),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                    color = FgText,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = when (nowPlayingArtworkStyle) {
+                        NowPlayingArtworkStyle.ARTIST_FULLSCREEN -> stringResource(R.string.settings_player_art_desc_artist)
+                        NowPlayingArtworkStyle.ALBUM_ART_NORMAL -> stringResource(R.string.settings_player_art_desc_album)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = FgTextMuted,
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    NowPlayingArtworkStyle.entries.forEach { style ->
+                        val selected = style == nowPlayingArtworkStyle
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .heightIn(min = 48.dp)
+                                .background(if (selected) FgPrimary else FgSurfaceAlt)
+                                .border(1.dp, if (selected) FgPrimary else FgBorder)
+                                .clickable { onChangeNowPlayingArtworkStyle(style) }
+                                .padding(horizontal = 10.dp, vertical = 8.dp)
+                                .testTag("player_art_${style.name.lowercase()}"),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = stringResource(style.labelRes()),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = if (selected) Color.White else FgText,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Section 3: Language
         item {
             SettingsSection(title = stringResource(R.string.settings_section_language)) {
                 Text(

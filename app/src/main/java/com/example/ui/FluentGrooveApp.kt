@@ -354,6 +354,7 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                     NowPlayingScreen(
                                         currentTrack = state.currentTrack,
                                         artistImageUrl = currentArtistImageUrl,
+                                        artworkStyle = state.nowPlayingArtworkStyle,
                                         isPlaying = state.isPlaying,
                                         elapsedSeconds = state.elapsedSeconds,
                                         elapsedMs = state.elapsedMs,
@@ -425,6 +426,7 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                         themeMode = state.themeMode,
                                         accentColor = state.accentColor,
                                         appLanguage = state.appLanguage,
+                                        nowPlayingArtworkStyle = state.nowPlayingArtworkStyle,
                                         acrylicDensity = state.acrylicDensity,
                                         eqPreset = state.eqPreset,
                                         eqGains = state.eqGains,
@@ -435,6 +437,7 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                         onChangeThemeMode = viewModel::setThemeMode,
                                         onChangeAccentColor = viewModel::setAccentColor,
                                         onChangeAppLanguage = viewModel::setAppLanguage,
+                                        onChangeNowPlayingArtworkStyle = viewModel::setNowPlayingArtworkStyle,
                                         onChangeAcrylicDensity = viewModel::setAcrylicDensity,
                                         onSelectEqPreset = viewModel::selectEqPreset,
                                         onChangeEqGains = viewModel::updateEqGains,

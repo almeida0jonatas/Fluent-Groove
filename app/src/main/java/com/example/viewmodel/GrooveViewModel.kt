@@ -23,6 +23,7 @@ import com.example.model.EqualizerGains
 import com.example.model.EqualizerPresetName
 import com.example.model.LyricsUiState
 import com.example.model.MyMusicTab
+import com.example.model.NowPlayingArtworkStyle
 import com.example.model.Playlist
 import com.example.model.RecentPlayEntry
 import com.example.model.RepeatMode
@@ -56,6 +57,7 @@ data class GrooveUiState(
     val themeMode: AppThemeMode = AppThemeMode.SYSTEM,
     val accentColor: AccentColorOption = AccentColorOption.BLUE,
     val appLanguage: AppLanguage = AppLanguage.SYSTEM,
+    val nowPlayingArtworkStyle: NowPlayingArtworkStyle = NowPlayingArtworkStyle.ARTIST_FULLSCREEN,
     val acrylicDensity: AcrylicDensity = AcrylicDensity.STANDARD,
     val showTitleBar: Boolean = true,
     val isMiniPlayer: Boolean = false,
@@ -290,6 +292,7 @@ class GrooveViewModel(application: Application) : AndroidViewModel(application) 
                         themeMode = prefs.themeMode,
                         accentColor = prefs.accentColor,
                         appLanguage = prefs.appLanguage,
+                        nowPlayingArtworkStyle = prefs.nowPlayingArtworkStyle,
                         acrylicDensity = prefs.acrylicDensity,
                         eqPreset = prefs.eqPreset,
                         eqGains = prefs.eqGains,
@@ -802,6 +805,11 @@ class GrooveViewModel(application: Application) : AndroidViewModel(application) 
     fun setAppLanguage(language: AppLanguage) {
         _uiState.update { it.copy(appLanguage = language) }
         viewModelScope.launch { prefsRepo.setAppLanguage(language) }
+    }
+
+    fun setNowPlayingArtworkStyle(style: NowPlayingArtworkStyle) {
+        _uiState.update { it.copy(nowPlayingArtworkStyle = style) }
+        viewModelScope.launch { prefsRepo.setNowPlayingArtworkStyle(style) }
     }
 
     fun setAcrylicDensity(density: AcrylicDensity) {

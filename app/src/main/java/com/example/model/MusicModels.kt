@@ -11,6 +11,11 @@ enum class AppLanguage {
     ENGLISH,
 }
 
+enum class NowPlayingArtworkStyle {
+    ARTIST_FULLSCREEN,
+    ALBUM_ART_NORMAL,
+}
+
 enum class AccentColorOption(
     val label: String,
     val primaryHex: Long,

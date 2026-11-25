@@ -173,6 +173,12 @@
     <string name="settings_language_english">English</string>
     <string name="settings_language_desc_system">Automatically matches your device\'s system language</string>
     <string name="settings_language_desc_english">Always display the interface in English</string>
+    <string name="settings_section_now_playing">Now Playing</string>
+    <string name="settings_player_art_label">Main player artwork</string>
+    <string name="settings_player_art_artist_fullscreen">Artist fullscreen</string>
+    <string name="settings_player_art_album_normal">Album cover</string>
+    <string name="settings_player_art_desc_artist">Display the artist photo edge-to-edge across the full player screen</string>
+    <string name="settings_player_art_desc_album">Display the album artwork centered at normal size over an atmospheric backdrop</string>
     <string name="settings_section_acrylic">Fluent Acrylic &amp; Interface</string>
     <string name="settings_acrylic_density">Sidebar &amp; Header Acrylic Density</string>
     <string name="acrylic_subtle">Subtle</string>

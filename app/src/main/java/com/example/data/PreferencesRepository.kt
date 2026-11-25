@@ -14,6 +14,7 @@ import com.example.model.AppLanguage
 import com.example.model.AppThemeMode
 import com.example.model.EqualizerGains
 import com.example.model.EqualizerPresetName
+import com.example.model.NowPlayingArtworkStyle
 import com.example.model.RepeatMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -27,6 +28,7 @@ data class UserPrefs(
     val themeMode: AppThemeMode = AppThemeMode.SYSTEM,
     val accentColor: AccentColorOption = AccentColorOption.BLUE,
     val appLanguage: AppLanguage = AppLanguage.SYSTEM,
+    val nowPlayingArtworkStyle: NowPlayingArtworkStyle = NowPlayingArtworkStyle.ARTIST_FULLSCREEN,
     val acrylicDensity: AcrylicDensity = AcrylicDensity.STANDARD,
     val eqPreset: EqualizerPresetName = EqualizerPresetName.FLAT,
     val eqGains: EqualizerGains = EqualizerGains(),
@@ -49,6 +51,7 @@ class PreferencesRepository(private val context: Context) {
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val ACCENT_COLOR = stringPreferencesKey("accent_color")
         val APP_LANGUAGE = stringPreferencesKey("app_language")
+        val NOW_PLAYING_ARTWORK_STYLE = stringPreferencesKey("now_playing_artwork_style")
         val ACRYLIC_DENSITY = stringPreferencesKey("acrylic_density")
         val EQ_PRESET = stringPreferencesKey("eq_preset")
         val EQ_LOW = intPreferencesKey("eq_low")
@@ -75,6 +78,9 @@ class PreferencesRepository(private val context: Context) {
         val appLanguage = prefs[Keys.APP_LANGUAGE]
             ?.let { runCatching { AppLanguage.valueOf(it) }.getOrNull() }
             ?: AppLanguage.SYSTEM
+        val nowPlayingArtworkStyle = prefs[Keys.NOW_PLAYING_ARTWORK_STYLE]
+            ?.let { runCatching { NowPlayingArtworkStyle.valueOf(it) }.getOrNull() }
+            ?: NowPlayingArtworkStyle.ARTIST_FULLSCREEN
         val density = prefs[Keys.ACRYLIC_DENSITY]
             ?.let { runCatching { AcrylicDensity.valueOf(it) }.getOrNull() }
             ?: AcrylicDensity.STANDARD
@@ -88,6 +94,7 @@ class PreferencesRepository(private val context: Context) {
             themeMode = themeMode,
             accentColor = accentColor,
             appLanguage = appLanguage,
+            nowPlayingArtworkStyle = nowPlayingArtworkStyle,
             acrylicDensity = density,
             eqPreset = preset,
             eqGains = EqualizerGains(
@@ -160,6 +167,10 @@ class PreferencesRepository(private val context: Context) {
         context.groovePrefsDataStore.edit { it[Keys.APP_LANGUAGE] = language.name }
     }
 
+    suspend fun setNowPlayingArtworkStyle(style: NowPlayingArtworkStyle) {
+        context.groovePrefsDataStore.edit { it[Keys.NOW_PLAYING_ARTWORK_STYLE] = style.name }
+    }
+
     suspend fun setDemoSeeded(seeded: Boolean) {
         context.groovePrefsDataStore.edit { it[Keys.DEMO_SEEDED] = seeded }
     }
@@ -198,11 +209,13 @@ class PreferencesRepository(private val context: Context) {
             val savedTheme = it[Keys.THEME_MODE]
             val savedAccent = it[Keys.ACCENT_COLOR]
             val savedLanguage = it[Keys.APP_LANGUAGE]
+            val savedArtworkStyle = it[Keys.NOW_PLAYING_ARTWORK_STYLE]
             it.clear()
             it[Keys.DEMO_SEEDED] = true
             if (savedTheme != null) it[Keys.THEME_MODE] = savedTheme
             if (savedAccent != null) it[Keys.ACCENT_COLOR] = savedAccent
             if (savedLanguage != null) it[Keys.APP_LANGUAGE] = savedLanguage
+            if (savedArtworkStyle != null) it[Keys.NOW_PLAYING_ARTWORK_STYLE] = savedArtworkStyle
         }
     }
 }
