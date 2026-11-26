@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Equalizer
 import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PictureInPictureAlt
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
@@ -30,8 +29,6 @@ import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -86,7 +83,6 @@ fun PlayerBar(
     onOpenNowPlaying: () -> Unit,
     onOpenArtist: (String) -> Unit,
     onOpenSettingsEq: () -> Unit,
-    onEnterMiniPlayer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val totalDur = durationSeconds.coerceAtLeast(currentTrack?.duration ?: 0).coerceAtLeast(1)
@@ -319,27 +315,25 @@ fun PlayerBar(
                             style = TabularNumStyle.copy(fontSize = 11.sp),
                             color = Color.White.copy(alpha = 0.88f),
                         )
-                        Slider(
-                            value = if (isDragging) dragValue else safeElapsed.toFloat(),
-                            onValueChange = {
-                                isDragging = true
-                                dragValue = it
-                            },
-                            onValueChangeFinished = {
-                                isDragging = false
-                                onSeek(dragValue.toInt())
-                            },
-                            valueRange = 0f..totalDur.toFloat(),
+                        GrooveSeekBar(
+                            progress = ((if (isDragging) dragValue else safeElapsed.toFloat()) / totalDur.toFloat()).coerceIn(0f, 1f),
                             enabled = currentTrack != null,
-                            colors = SliderDefaults.colors(
-                                thumbColor = Color.White,
-                                activeTrackColor = Color.White,
-                                inactiveTrackColor = Color.White.copy(alpha = 0.30f),
-                            ),
+                            isDragging = isDragging,
+                            onScrubStartOrMove = { fraction ->
+                                isDragging = true
+                                dragValue = fraction * totalDur.toFloat()
+                            },
+                            onScrubEnd = { fraction ->
+                                isDragging = false
+                                val target = (fraction * totalDur.toFloat()).toInt()
+                                dragValue = target.toFloat()
+                                onSeek(target)
+                            },
+                            barHeight = 28.dp,
+                            seekBarTestTag = "player_bar_seek_bar",
                             modifier = Modifier
                                 .weight(1f)
-                                .height(26.dp)
-                                .padding(horizontal = 6.dp),
+                                .padding(horizontal = 8.dp),
                         )
                         Text(
                             text = formatDuration(currentTrack?.duration ?: durationSeconds),
@@ -390,29 +384,23 @@ fun PlayerBar(
                         )
                     }
 
-                    Slider(
-                        value = if (isMuted) 0f else volume,
-                        onValueChange = onVolumeChange,
-                        valueRange = 0f..1f,
-                        colors = SliderDefaults.colors(
-                            thumbColor = Color.White,
-                            activeTrackColor = Color.White,
-                            inactiveTrackColor = Color.White.copy(alpha = 0.30f),
-                        ),
-                        modifier = Modifier.width(84.dp),
+                    var isDraggingVolume by remember { mutableStateOf(false) }
+                    GrooveSeekBar(
+                        progress = if (isMuted) 0f else volume.coerceIn(0f, 1f),
+                        enabled = true,
+                        isDragging = isDraggingVolume,
+                        onScrubStartOrMove = { fraction ->
+                            isDraggingVolume = true
+                            onVolumeChange(fraction)
+                        },
+                        onScrubEnd = { fraction ->
+                            isDraggingVolume = false
+                            onVolumeChange(fraction)
+                        },
+                        barHeight = 32.dp,
+                        seekBarTestTag = "player_bar_volume_slider",
+                        modifier = Modifier.width(88.dp),
                     )
-
-                    IconButton(
-                        onClick = onEnterMiniPlayer,
-                        modifier = Modifier.size(36.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.PictureInPictureAlt,
-                            contentDescription = stringResource(R.string.cd_mini_player),
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp),
-                        )
-                    }
                 }
             }
         }

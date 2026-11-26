@@ -51,6 +51,7 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PictureInPictureAlt
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Save
@@ -72,15 +73,21 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import android.graphics.Bitmap
+import android.os.Build
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -90,6 +97,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Size
+import coil.transform.Transformation
 import com.example.R
 import com.example.model.LyricsUiState
 import com.example.model.NowPlayingArtworkStyle
@@ -171,7 +181,6 @@ fun NowPlayingScreen(
     }
 
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val hasSyncedLyrics = (lyricsState as? LyricsUiState.Loaded)?.lyrics?.hasSyncedLyrics == true
 
     if (currentTrack == null && queue.isEmpty()) {
         Column(
@@ -317,19 +326,50 @@ fun NowPlayingScreen(
                     ),
             )
         } else {
-            // Atmospheric ambient backdrop tinted from the current album palette
-            val artStart = currentTrack?.artDesign?.colorStart?.let { Color(it).copy(alpha = 0.68f) } ?: FgDarkBackdrop
-            val artEnd = currentTrack?.artDesign?.colorEnd?.let { Color(it).copy(alpha = 0.42f) } ?: FgDarkBackdrop
+            // 1. Full-bleed blurred album artwork backdrop
+            BlurredAlbumBackdrop(
+                currentTrack = currentTrack,
+                modifier = Modifier.fillMaxSize(),
+            )
+
+            // 2. Subtle atmospheric tint so the centered crisp cover and white overlays pop cleanly
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.28f)),
+            )
+
+            // 3. Top scrim for crisp overlay header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(136.dp)
+                    .align(Alignment.TopCenter)
                     .background(
                         Brush.verticalGradient(
                             colorStops = arrayOf(
-                                0.0f to artStart,
-                                0.45f to artEnd,
-                                0.78f to FgDarkBackdrop,
-                                1.0f to Color.Black.copy(alpha = 0.94f),
+                                0.0f to Color.Black.copy(alpha = 0.48f),
+                                0.55f to Color.Black.copy(alpha = 0.18f),
+                                1.0f to Color.Transparent,
+                            )
+                        )
+                    ),
+            )
+
+            // 4. Bottom scrim for crisp metadata, seekbar, transport & queue arrow
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.56f)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colorStops = arrayOf(
+                                0.0f to Color.Transparent,
+                                0.30f to Color.Black.copy(alpha = 0.22f),
+                                0.58f to Color.Black.copy(alpha = 0.58f),
+                                0.84f to Color.Black.copy(alpha = 0.82f),
+                                1.0f to Color.Black.copy(alpha = 0.90f),
                             )
                         )
                     ),
@@ -386,22 +426,12 @@ fun NowPlayingScreen(
                         onClick = { isFullscreenLyrics = true },
                         modifier = Modifier.testTag("np_lyrics_button"),
                     ) {
-                        Box(contentAlignment = Alignment.TopEnd) {
-                            Icon(
-                                imageVector = Icons.Filled.Lyrics,
-                                contentDescription = stringResource(R.string.cd_lyrics),
-                                tint = Color.White,
-                                modifier = Modifier.size(23.dp),
-                            )
-                            if (hasSyncedLyrics) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(7.dp)
-                                        .clip(CircleShape)
-                                        .background(FgAccentOnDark),
-                                )
-                            }
-                        }
+                        Icon(
+                            imageVector = Icons.Filled.Lyrics,
+                            contentDescription = stringResource(R.string.cd_lyrics),
+                            tint = Color.White,
+                            modifier = Modifier.size(23.dp),
+                        )
                     }
                 }
             }
@@ -802,6 +832,139 @@ private fun NowPlayingBackdrop(
 }
 
 @Composable
+private fun BlurredAlbumBackdrop(
+    currentTrack: Track?,
+    modifier: Modifier = Modifier,
+) {
+    val coverUri = currentTrack?.coverUri?.takeIf { it.isNotBlank() }
+    Box(
+        modifier = modifier
+            .clip(RectangleShape)
+            .background(FgDarkBackdrop),
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlbumArtwork(
+                coverUri = coverUri,
+                artDesign = currentTrack?.artDesign,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .scale(1.14f)
+                    .blur(
+                        radius = 30.dp,
+                        edgeTreatment = BlurredEdgeTreatment.Rectangle,
+                    ),
+            )
+        } else {
+            AlbumArtwork(
+                coverUri = null,
+                artDesign = currentTrack?.artDesign,
+                modifier = Modifier.fillMaxSize(),
+            )
+            if (coverUri != null) {
+                val context = LocalContext.current
+                val request = remember(coverUri) {
+                    ImageRequest.Builder(context)
+                        .data(coverUri)
+                        .size(128, 128)
+                        .allowHardware(false)
+                        .transformations(FastBoxBlurTransformation(radius = 8, passes = 2))
+                        .build()
+                }
+                AsyncImage(
+                    model = request,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .scale(1.14f),
+                )
+            }
+        }
+    }
+}
+
+private class FastBoxBlurTransformation(
+    private val radius: Int = 8,
+    private val passes: Int = 2,
+) : Transformation {
+    override val cacheKey: String = "FastBoxBlurTransformation(radius=$radius,passes=$passes)"
+
+    override suspend fun transform(input: Bitmap, size: Size): Bitmap {
+        val w = input.width
+        val h = input.height
+        if (w <= 2 || h <= 2 || radius <= 0) return input
+
+        val src = if (input.config == Bitmap.Config.ARGB_8888) {
+            input.copy(Bitmap.Config.ARGB_8888, true)
+        } else {
+            input.copy(Bitmap.Config.ARGB_8888, true)
+        }
+
+        val pixels = IntArray(w * h)
+        val temp = IntArray(w * h)
+        src.getPixels(pixels, 0, w, 0, 0, w, h)
+
+        val r = radius.coerceAtMost((minOf(w, h) - 1).coerceAtLeast(1))
+        val window = r * 2 + 1
+
+        repeat(passes) {
+            // Horizontal pass
+            for (y in 0 until h) {
+                val rowOffset = y * w
+                var sumR = 0
+                var sumG = 0
+                var sumB = 0
+                for (i in -r..r) {
+                    val p = pixels[rowOffset + i.coerceIn(0, w - 1)]
+                    sumR += (p shr 16) and 0xFF
+                    sumG += (p shr 8) and 0xFF
+                    sumB += p and 0xFF
+                }
+                for (x in 0 until w) {
+                    temp[rowOffset + x] = (0xFF shl 24) or
+                        ((sumR / window) shl 16) or
+                        ((sumG / window) shl 8) or
+                        (sumB / window)
+                    val outP = pixels[rowOffset + (x - r).coerceIn(0, w - 1)]
+                    val inP = pixels[rowOffset + (x + r + 1).coerceIn(0, w - 1)]
+                    sumR += ((inP shr 16) and 0xFF) - ((outP shr 16) and 0xFF)
+                    sumG += ((inP shr 8) and 0xFF) - ((outP shr 8) and 0xFF)
+                    sumB += (inP and 0xFF) - (outP and 0xFF)
+                }
+            }
+            // Vertical pass
+            for (x in 0 until w) {
+                var sumR = 0
+                var sumG = 0
+                var sumB = 0
+                for (i in -r..r) {
+                    val p = temp[i.coerceIn(0, h - 1) * w + x]
+                    sumR += (p shr 16) and 0xFF
+                    sumG += (p shr 8) and 0xFF
+                    sumB += p and 0xFF
+                }
+                for (y in 0 until h) {
+                    pixels[y * w + x] = (0xFF shl 24) or
+                        ((sumR / window) shl 16) or
+                        ((sumG / window) shl 8) or
+                        (sumB / window)
+                    val outP = temp[(y - r).coerceIn(0, h - 1) * w + x]
+                    val inP = temp[(y + r + 1).coerceIn(0, h - 1) * w + x]
+                    sumR += ((inP shr 16) and 0xFF) - ((outP shr 16) and 0xFF)
+                    sumG += ((inP shr 8) and 0xFF) - ((outP shr 8) and 0xFF)
+                    sumB += (inP and 0xFF) - (outP and 0xFF)
+                }
+            }
+        }
+
+        val output = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        output.setPixels(pixels, 0, w, 0, 0, w, h)
+        if (src !== input) src.recycle()
+        return output
+    }
+}
+
+@Composable
 private fun FullscreenLyricsStage(
     currentTrack: Track,
     isPlaying: Boolean,
@@ -833,21 +996,70 @@ private fun FullscreenLyricsStage(
         }
     }
 
-    val bgStart = Color(currentTrack.artDesign.colorStart).copy(alpha = 0.85f)
-    val bgEnd = FgDarkBackdrop
     val totalDur = durationSeconds.coerceAtLeast(currentTrack.duration).coerceAtLeast(1)
     val safeElapsed = elapsedSeconds.coerceIn(0, totalDur)
     var isDragging by remember { mutableStateOf(false) }
     var dragPos by remember { mutableFloatStateOf(0f) }
     val displayedElapsed = if (isDragging) dragPos.toInt() else safeElapsed
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(colors = listOf(bgStart, bgEnd)))
-            .statusBarsPadding()
-            .navigationBarsPadding(),
+            .background(FgDarkBackdrop),
     ) {
+        // 1. Full-bleed blurred album artwork backdrop matching the main player
+        BlurredAlbumBackdrop(
+            currentTrack = currentTrack,
+            modifier = Modifier.fillMaxSize(),
+        )
+
+        // 2. Balanced atmospheric tint for crisp lyrics readability on any album cover
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.38f)),
+        )
+
+        // 3. Top scrim for header legibility
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(136.dp)
+                .align(Alignment.TopCenter)
+                .background(
+                    Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.0f to Color.Black.copy(alpha = 0.48f),
+                            0.55f to Color.Black.copy(alpha = 0.18f),
+                            1.0f to Color.Transparent,
+                        )
+                    )
+                ),
+        )
+
+        // 4. Bottom scrim for pinned seekbar & transport controls
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.32f)
+                .align(Alignment.BottomCenter)
+                .background(
+                    Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.0f to Color.Transparent,
+                            0.45f to Color.Black.copy(alpha = 0.44f),
+                            1.0f to Color.Black.copy(alpha = 0.84f),
+                        )
+                    )
+                ),
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+        ) {
         // Top track bar
         Row(
             modifier = Modifier
@@ -878,6 +1090,17 @@ private fun FullscreenLyricsStage(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.clickable { onOpenArtist(currentTrack.artistId) },
+                )
+            }
+            IconButton(
+                onClick = onRefreshLyrics,
+                modifier = Modifier.testTag("lyrics_refresh_button"),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = stringResource(R.string.cd_refresh_lyrics),
+                    tint = Color.White,
+                    modifier = Modifier.size(22.dp),
                 )
             }
             IconButton(
@@ -1059,6 +1282,7 @@ private fun FullscreenLyricsStage(
                     }
                 }
             }
+        }
         }
     }
 }

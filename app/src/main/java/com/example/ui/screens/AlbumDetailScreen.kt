@@ -101,9 +101,10 @@ fun AlbumDetailScreen(
                         )
                     }
                     Text(
-                        text = stringResource(R.string.tab_albums),
+                        text = stringResource(R.string.cd_back),
                         style = MaterialTheme.typography.titleSmall,
                         color = FgTextMuted,
+                        modifier = Modifier.clickable(onClick = onBack),
                     )
                 }
 

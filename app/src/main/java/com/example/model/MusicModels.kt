@@ -143,6 +143,7 @@ enum class MyMusicTab(val label: String) {
     SONGS("Songs"),
     ARTISTS("Artists"),
     ALBUMS("Albums"),
+    PLAYLISTS("Playlists"),
 }
 
 enum class SongSortOrder(val label: String) {

@@ -87,6 +87,17 @@ fun ArtistDetailScreen(
         )
     }
 
+    val sortedTracks = remember(tracks, sortedAlbums) {
+        val albumOrder = sortedAlbums.withIndex().associate { (index, album) -> album.id to index }
+        tracks.sortedWith(
+            compareBy<Track> { albumOrder[it.albumId] ?: Int.MAX_VALUE }
+                .thenByDescending { it.year }
+                .thenBy { it.album.lowercase() }
+                .thenBy { if (it.trackNumber > 0) it.trackNumber else Int.MAX_VALUE }
+                .thenBy { it.title.lowercase() }
+        )
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -112,9 +123,10 @@ fun ArtistDetailScreen(
                         )
                     }
                     Text(
-                        text = stringResource(R.string.tab_artists),
+                        text = stringResource(R.string.cd_back),
                         style = MaterialTheme.typography.titleSmall,
                         color = FgTextMuted,
+                        modifier = Modifier.clickable(onClick = onBack),
                     )
                 }
 
@@ -151,7 +163,7 @@ fun ArtistDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Button(
-                        onClick = { onPlayAll(tracks) },
+                        onClick = { onPlayAll(sortedTracks) },
                         shape = RectangleShape,
                         colors = ButtonDefaults.buttonColors(containerColor = FgPrimary),
                         modifier = Modifier.testTag("artist_play_all_button"),
@@ -161,7 +173,7 @@ fun ArtistDetailScreen(
                         Text(stringResource(R.string.action_play_all), color = Color.White)
                     }
                     OutlinedButton(
-                        onClick = { onShuffleAll(tracks) },
+                        onClick = { onShuffleAll(sortedTracks) },
                         shape = RectangleShape,
                     ) {
                         Icon(Icons.Filled.Shuffle, contentDescription = null, tint = FgText, modifier = Modifier.size(16.dp))
@@ -231,7 +243,7 @@ fun ArtistDetailScreen(
             HorizontalDivider(color = FgBorder)
         }
 
-        itemsIndexed(tracks, key = { _, t -> t.id }) { index, track ->
+        itemsIndexed(sortedTracks, key = { _, t -> t.id }) { index, track ->
             val isCurrent = track.id == currentTrackId
             TrackRow(
                 track = track,
@@ -240,7 +252,7 @@ fun ArtistDetailScreen(
                 isPlaying = isPlaying,
                 showArtwork = true,
                 showAlbum = true,
-                onPlay = { if (isCurrent) onTogglePlay() else onPlayTrack(track, tracks) },
+                onPlay = { if (isCurrent) onTogglePlay() else onPlayTrack(track, sortedTracks) },
                 onAddToQueue = { onAddToQueue(track) },
                 onAddToPlaylist = { onRequestAddTrackToPlaylist(track) },
                 onOpenAlbum = { onOpenAlbum(track.albumId) },

@@ -13,22 +13,17 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +36,6 @@ import com.example.model.Album
 import com.example.model.MyMusicTab
 import com.example.model.ScreenRoute
 import com.example.model.Track
-import com.example.ui.components.AcrylicSidebar
 import com.example.ui.components.AddToPlaylistDialog
 import com.example.ui.components.MiniPlayerView
 import com.example.ui.components.PlayerBar
@@ -57,13 +51,10 @@ import com.example.ui.screens.SettingsScreen
 import com.example.ui.theme.FgSurface
 import com.example.ui.theme.FgToastBg
 import com.example.viewmodel.GrooveViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun FluentGrooveApp(viewModel: GrooveViewModel) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     // Dialog states
     var showCreatePlaylistDialog by remember { mutableStateOf(false) }
@@ -118,13 +109,10 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
         pickLyricsFileLauncher.launch(arrayOf("*/*"))
     }
 
-    // System back button support for drawer, mini player, active My Music search, and navigation stack
+    // System back button support for mini player, active My Music search, and navigation stack
     val hasActiveMyMusicSearch = state.route is ScreenRoute.MyMusic && state.searchQuery.isNotBlank()
-    BackHandler(enabled = drawerState.isOpen || state.isMiniPlayer || hasActiveMyMusicSearch || state.backStack.isNotEmpty()) {
-        when {
-            drawerState.isOpen -> scope.launch { drawerState.close() }
-            else -> viewModel.navigateBack()
-        }
+    BackHandler(enabled = state.isMiniPlayer || hasActiveMyMusicSearch || state.backStack.isNotEmpty() || state.route !is ScreenRoute.MyMusic) {
+        viewModel.navigateBackOr(ScreenRoute.MyMusic(MyMusicTab.HOME))
     }
 
     if (showCreatePlaylistDialog) {
@@ -197,93 +185,84 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
     ) {
         val isWideScreen = maxWidth >= 720.dp
 
-        val mainShellContent: @Composable () -> Unit = {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    val isNowPlayingRoute = state.route is ScreenRoute.NowPlaying
-                    if (!isNowPlayingRoute && (!isWideScreen || state.showTitleBar)) {
-                        TopAcrylicBar(
-                            acrylicDensity = state.acrylicDensity,
-                            isExpandedScreen = isWideScreen,
-                            onOpenMenu = { scope.launch { drawerState.open() } },
-                            onEnterMiniPlayer = { viewModel.setMiniPlayer(true) },
-                        )
-                    }
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                val isNowPlayingRoute = state.route is ScreenRoute.NowPlaying
+                if (!isNowPlayingRoute) {
+                    val canNavigateBack = state.route is ScreenRoute.Settings ||
+                        state.route is ScreenRoute.PlaylistDetail ||
+                        state.route is ScreenRoute.RecentPlays
+                    TopAcrylicBar(
+                        acrylicDensity = state.acrylicDensity,
+                        canNavigateBack = canNavigateBack,
+                        isSettingsActive = state.route is ScreenRoute.Settings,
+                        onNavigateBack = {
+                            viewModel.navigateBackOr(ScreenRoute.MyMusic(MyMusicTab.HOME))
+                        },
+                        onOpenHome = viewModel::navigateHome,
+                        onOpenSettings = { viewModel.navigateTo(ScreenRoute.Settings) },
+                    )
+                }
 
-                    // Middle Shell: Fixed Acrylic Sidebar (wide) + Pure White Content Canvas
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                    ) {
-                        if (isWideScreen) {
-                            AcrylicSidebar(
-                                expanded = state.sidebarExpanded,
-                                isDrawerMode = false,
-                                acrylicDensity = state.acrylicDensity,
-                                route = state.route,
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .background(FgSurface),
+                ) {
+                    when (val currentRoute = state.route) {
+                        is ScreenRoute.MyMusic -> {
+                            MyMusicScreen(
+                                activeTab = currentRoute.tab,
+                                searchQuery = state.searchQuery,
+                                albums = state.albums,
+                                artists = state.artists,
+                                tracks = state.tracks,
                                 playlists = state.playlists,
-                                onToggleExpanded = viewModel::toggleSidebarExpanded,
-                                onCloseDrawer = {},
-                                onNavigate = { next -> viewModel.navigateTo(next) },
+                                recentPlays = state.recentPlays,
+                                songSortOrder = state.songSortOrder,
+                                currentTrackId = state.currentTrack?.id,
+                                isPlaying = state.isPlaying,
+                                isImporting = state.isImporting,
+                                importingCount = state.importingCount,
+                                onChangeTab = viewModel::selectMyMusicTab,
+                                onSearchQueryChange = viewModel::onSearchQueryChanged,
+                                onChangeSortOrder = viewModel::setSongSortOrder,
+                                onPlayAlbum = viewModel::playAlbum,
+                                onPlayArtist = viewModel::playArtist,
+                                onPlayPlaylist = viewModel::playTrackList,
+                                onPlayTrack = viewModel::playTrack,
+                                onTogglePlay = viewModel::togglePlayPause,
+                                onShuffleAll = viewModel::shuffleTrackList,
+                                onOpenAlbum = { id -> viewModel.navigateTo(ScreenRoute.AlbumDetail(id)) },
+                                onOpenArtist = { id -> viewModel.navigateTo(ScreenRoute.ArtistDetail(id)) },
+                                onOpenPlaylist = { id -> viewModel.navigateTo(ScreenRoute.PlaylistDetail(id)) },
                                 onRequestCreatePlaylist = { showCreatePlaylistDialog = true },
+                                onOpenRecentPlays = { viewModel.navigateTo(ScreenRoute.RecentPlays) },
+                                onAddToQueue = viewModel::addToQueue,
+                                onAddAlbumToQueue = viewModel::addAlbumToQueue,
+                                onRequestAddTrackToPlaylist = { track -> trackPendingPlaylist = track },
                                 onImportFiles = launchFilePicker,
                                 onImportFolder = launchFolderPicker,
+                                onLoadDemoTrack = viewModel::loadDemoTrack,
                             )
                         }
-
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxSize()
-                                .background(FgSurface),
-                        ) {
-                            when (val currentRoute = state.route) {
-                                is ScreenRoute.MyMusic -> {
-                                    MyMusicScreen(
-                                        activeTab = currentRoute.tab,
-                                        searchQuery = state.searchQuery,
-                                        albums = state.albums,
-                                        artists = state.artists,
-                                        tracks = state.tracks,
-                                        recentPlays = state.recentPlays,
-                                        songSortOrder = state.songSortOrder,
-                                        currentTrackId = state.currentTrack?.id,
-                                        isPlaying = state.isPlaying,
-                                        isImporting = state.isImporting,
-                                        importingCount = state.importingCount,
-                                        onChangeTab = { tab -> viewModel.navigateTo(ScreenRoute.MyMusic(tab)) },
-                                        onSearchQueryChange = viewModel::onSearchQueryChanged,
-                                        onChangeSortOrder = viewModel::setSongSortOrder,
-                                        onPlayAlbum = viewModel::playAlbum,
-                                        onPlayArtist = viewModel::playArtist,
-                                        onPlayTrack = viewModel::playTrack,
-                                        onTogglePlay = viewModel::togglePlayPause,
-                                        onShuffleAll = viewModel::shuffleTrackList,
-                                        onOpenAlbum = { id -> viewModel.navigateTo(ScreenRoute.AlbumDetail(id)) },
-                                        onOpenArtist = { id -> viewModel.navigateTo(ScreenRoute.ArtistDetail(id)) },
-                                        onOpenRecentPlays = { viewModel.navigateTo(ScreenRoute.RecentPlays) },
-                                        onAddToQueue = viewModel::addToQueue,
-                                        onAddAlbumToQueue = viewModel::addAlbumToQueue,
-                                        onRequestAddTrackToPlaylist = { track -> trackPendingPlaylist = track },
-                                        onImportFiles = launchFilePicker,
-                                        onImportFolder = launchFolderPicker,
-                                        onLoadDemoTrack = viewModel::loadDemoTrack,
-                                    )
-                                }
 
                                 is ScreenRoute.AlbumDetail -> {
                                     val album = state.albums.firstOrNull { it.id == currentRoute.albumId }
                                     if (album != null) {
                                         val albumTracks = state.tracks
                                             .filter { it.albumId == album.id }
-                                            .sortedBy { it.trackNumber }
+                                            .sortedWith(
+                                                compareBy<Track> { if (it.trackNumber > 0) it.trackNumber else Int.MAX_VALUE }
+                                                    .thenBy { it.title.lowercase() }
+                                            )
                                         AlbumDetailScreen(
                                             album = album,
                                             tracks = albumTracks,
                                             currentTrackId = state.currentTrack?.id,
                                             isPlaying = state.isPlaying,
-                                            onBack = { viewModel.navigateTo(ScreenRoute.MyMusic(MyMusicTab.ALBUMS)) },
+                                            onBack = { viewModel.navigateBackOr(ScreenRoute.MyMusic(MyMusicTab.ALBUMS)) },
                                             onPlayAlbum = { viewModel.playAlbum(album) },
                                             onShuffleAlbum = { viewModel.shuffleTrackList(albumTracks) },
                                             onPlayTrack = viewModel::playTrack,
@@ -308,14 +287,23 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                                 compareByDescending<Album> { it.year }
                                                     .thenBy { it.title.lowercase() }
                                             )
-                                        val artistTracks = state.tracks.filter { it.artistId == artist.id }
+                                        val albumOrder = artistAlbums.withIndex().associate { (index, alb) -> alb.id to index }
+                                        val artistTracks = state.tracks
+                                            .filter { it.artistId == artist.id }
+                                            .sortedWith(
+                                                compareBy<Track> { albumOrder[it.albumId] ?: Int.MAX_VALUE }
+                                                    .thenByDescending { it.year }
+                                                    .thenBy { it.album.lowercase() }
+                                                    .thenBy { if (it.trackNumber > 0) it.trackNumber else Int.MAX_VALUE }
+                                                    .thenBy { it.title.lowercase() }
+                                            )
                                         ArtistDetailScreen(
                                             artist = artist,
                                             albums = artistAlbums,
                                             tracks = artistTracks,
                                             currentTrackId = state.currentTrack?.id,
                                             isPlaying = state.isPlaying,
-                                            onBack = { viewModel.navigateTo(ScreenRoute.MyMusic(MyMusicTab.ARTISTS)) },
+                                            onBack = { viewModel.navigateBackOr(ScreenRoute.MyMusic(MyMusicTab.ARTISTS)) },
                                             onPlayAll = viewModel::playTrackList,
                                             onShuffleAll = viewModel::shuffleTrackList,
                                             onPlayAlbum = viewModel::playAlbum,
@@ -365,9 +353,7 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                         currentQueueIndex = state.currentQueueIndex,
                                         lyricsState = state.lyricsState,
                                         onBack = {
-                                            if (!viewModel.navigateBack()) {
-                                                viewModel.navigateTo(ScreenRoute.MyMusic(MyMusicTab.HOME))
-                                            }
+                                            viewModel.navigateBackOr(ScreenRoute.MyMusic(MyMusicTab.HOME))
                                         },
                                         onTogglePlay = viewModel::togglePlayPause,
                                         onNext = viewModel::nextTrack,
@@ -430,7 +416,6 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                         acrylicDensity = state.acrylicDensity,
                                         eqPreset = state.eqPreset,
                                         eqGains = state.eqGains,
-                                        showTitleBar = state.showTitleBar,
                                         trackCount = state.tracks.size,
                                         albumCount = state.albums.size,
                                         playlistCount = state.playlists.size,
@@ -441,7 +426,6 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                         onChangeAcrylicDensity = viewModel::setAcrylicDensity,
                                         onSelectEqPreset = viewModel::selectEqPreset,
                                         onChangeEqGains = viewModel::updateEqGains,
-                                        onToggleTitleBar = viewModel::toggleShowTitleBar,
                                         onImportFiles = launchFilePicker,
                                         onImportFolder = launchFolderPicker,
                                         onLoadDemoTrack = viewModel::loadDemoTrack,
@@ -450,37 +434,35 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                 }
                             }
                         }
-                    }
 
-                    // Bottom Persistent Accent Blue Transport Deck (hidden while main Now Playing player is open)
-                    val showBottomPlayerBar = state.route !is ScreenRoute.NowPlaying
-                    if (showBottomPlayerBar) {
-                        PlayerBar(
-                            currentTrack = state.currentTrack,
-                            isPlaying = state.isPlaying,
-                            elapsedSeconds = state.elapsedSeconds,
-                            durationSeconds = state.durationSeconds,
-                            volume = state.volume,
-                            isMuted = state.isMuted,
-                            isShuffled = state.isShuffled,
-                            repeatMode = state.repeatMode,
-                            eqPreset = state.eqPreset,
-                            isWideLayout = isWideScreen,
-                            onTogglePlay = viewModel::togglePlayPause,
-                            onNext = viewModel::nextTrack,
-                            onPrevious = viewModel::previousTrack,
-                            onSeek = viewModel::seekTo,
-                            onVolumeChange = viewModel::setVolume,
-                            onToggleMute = viewModel::toggleMute,
-                            onToggleShuffle = viewModel::toggleShuffle,
-                            onCycleRepeat = viewModel::cycleRepeatMode,
-                            onOpenNowPlaying = { viewModel.navigateTo(ScreenRoute.NowPlaying) },
-                            onOpenArtist = { id -> viewModel.navigateTo(ScreenRoute.ArtistDetail(id)) },
-                            onOpenSettingsEq = { viewModel.navigateTo(ScreenRoute.Settings) },
-                            onEnterMiniPlayer = { viewModel.setMiniPlayer(true) },
-                        )
-                    }
+                // Bottom Persistent Accent Blue Transport Deck (hidden while main Now Playing player is open)
+                val showBottomPlayerBar = state.route !is ScreenRoute.NowPlaying
+                if (showBottomPlayerBar) {
+                    PlayerBar(
+                        currentTrack = state.currentTrack,
+                        isPlaying = state.isPlaying,
+                        elapsedSeconds = state.elapsedSeconds,
+                        durationSeconds = state.durationSeconds,
+                        volume = state.volume,
+                        isMuted = state.isMuted,
+                        isShuffled = state.isShuffled,
+                        repeatMode = state.repeatMode,
+                        eqPreset = state.eqPreset,
+                        isWideLayout = isWideScreen,
+                        onTogglePlay = viewModel::togglePlayPause,
+                        onNext = viewModel::nextTrack,
+                        onPrevious = viewModel::previousTrack,
+                        onSeek = viewModel::seekTo,
+                        onVolumeChange = viewModel::setVolume,
+                        onToggleMute = viewModel::toggleMute,
+                        onToggleShuffle = viewModel::toggleShuffle,
+                        onCycleRepeat = viewModel::cycleRepeatMode,
+                        onOpenNowPlaying = { viewModel.navigateTo(ScreenRoute.NowPlaying) },
+                        onOpenArtist = { id -> viewModel.navigateTo(ScreenRoute.ArtistDetail(id)) },
+                        onOpenSettingsEq = { viewModel.navigateTo(ScreenRoute.Settings) },
+                    )
                 }
+            }
 
                 // Crisp Windows 10 Toast matching App.tsx (#1C1B1B rounded-none)
                 val toastBottomPadding = when {
@@ -510,36 +492,8 @@ fun FluentGrooveApp(viewModel: GrooveViewModel) {
                                 color = Color.White,
                             )
                         }
-                    }
                 }
             }
-        }
-
-        if (isWideScreen) {
-            mainShellContent()
-        } else {
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    AcrylicSidebar(
-                        expanded = true,
-                        isDrawerMode = true,
-                        acrylicDensity = state.acrylicDensity,
-                        route = state.route,
-                        playlists = state.playlists,
-                        onToggleExpanded = {},
-                        onCloseDrawer = { scope.launch { drawerState.close() } },
-                        onNavigate = { next -> viewModel.navigateTo(next) },
-                        onRequestCreatePlaylist = {
-                            scope.launch { drawerState.close() }
-                            showCreatePlaylistDialog = true
-                        },
-                        onImportFiles = launchFilePicker,
-                        onImportFolder = launchFolderPicker,
-                    )
-                },
-                content = mainShellContent,
-            )
         }
     }
 }

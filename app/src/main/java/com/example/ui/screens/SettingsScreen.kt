@@ -32,10 +32,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -64,6 +60,7 @@ import com.example.model.EqualizerGains
 import com.example.model.EqualizerPresetName
 import com.example.model.NowPlayingArtworkStyle
 import com.example.ui.components.ConfirmDangerDialog
+import com.example.ui.components.GrooveSeekBar
 import com.example.ui.labelRes
 import com.example.ui.theme.FgBorder
 import com.example.ui.theme.FgDanger
@@ -85,7 +82,6 @@ fun SettingsScreen(
     acrylicDensity: AcrylicDensity,
     eqPreset: EqualizerPresetName,
     eqGains: EqualizerGains,
-    showTitleBar: Boolean,
     trackCount: Int,
     albumCount: Int,
     playlistCount: Int,
@@ -96,7 +92,6 @@ fun SettingsScreen(
     onChangeAcrylicDensity: (AcrylicDensity) -> Unit,
     onSelectEqPreset: (EqualizerPresetName) -> Unit,
     onChangeEqGains: (EqualizerGains) -> Unit,
-    onToggleTitleBar: () -> Unit,
     onImportFiles: () -> Unit,
     onImportFolder: () -> Unit,
     onLoadDemoTrack: () -> Unit,
@@ -377,32 +372,6 @@ fun SettingsScreen(
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.settings_show_top_bar),
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                            color = FgText,
-                        )
-                        Text(
-                            text = stringResource(R.string.settings_show_top_bar_desc),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = FgTextMuted,
-                        )
-                    }
-                    Switch(
-                        checked = showTitleBar,
-                        onCheckedChange = { onToggleTitleBar() },
-                        colors = SwitchDefaults.colors(checkedTrackColor = FgPrimary),
-                    )
-                }
             }
         }
 
@@ -450,18 +419,21 @@ fun SettingsScreen(
                     label = stringResource(R.string.eq_band_low),
                     valueDb = eqGains.low,
                     onChange = { onChangeEqGains(eqGains.copy(low = it)) },
+                    testTag = "eq_slider_low",
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 EqSliderRow(
                     label = stringResource(R.string.eq_band_mid),
                     valueDb = eqGains.mid,
                     onChange = { onChangeEqGains(eqGains.copy(mid = it)) },
+                    testTag = "eq_slider_mid",
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 EqSliderRow(
                     label = stringResource(R.string.eq_band_high),
                     valueDb = eqGains.high,
                     onChange = { onChangeEqGains(eqGains.copy(high = it)) },
+                    testTag = "eq_slider_high",
                 )
             }
         }
@@ -554,7 +526,11 @@ private fun EqSliderRow(
     label: String,
     valueDb: Int,
     onChange: (Int) -> Unit,
+    testTag: String,
 ) {
+    var isDragging by remember { mutableStateOf(false) }
+    val progress = ((valueDb + 12f) / 24f).coerceIn(0f, 1f)
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -567,16 +543,26 @@ private fun EqSliderRow(
                 color = FgPrimary,
             )
         }
-        Slider(
-            value = valueDb.toFloat(),
-            onValueChange = { onChange(it.roundToInt()) },
-            valueRange = -12f..12f,
-            steps = 23,
-            colors = SliderDefaults.colors(
-                thumbColor = FgPrimary,
-                activeTrackColor = FgPrimary,
-                inactiveTrackColor = FgBorder,
-            ),
+        Spacer(modifier = Modifier.height(2.dp))
+        GrooveSeekBar(
+            progress = progress,
+            enabled = true,
+            isDragging = isDragging,
+            onScrubStartOrMove = { fraction ->
+                isDragging = true
+                val db = (-12f + fraction * 24f).roundToInt().coerceIn(-12, 12)
+                if (db != valueDb) onChange(db)
+            },
+            onScrubEnd = { fraction ->
+                isDragging = false
+                val db = (-12f + fraction * 24f).roundToInt().coerceIn(-12, 12)
+                if (db != valueDb) onChange(db)
+            },
+            activeTrackColor = FgPrimary,
+            inactiveTrackColor = FgTextMuted.copy(alpha = 0.34f),
+            thumbColor = FgPrimary,
+            barHeight = 44.dp,
+            seekBarTestTag = testTag,
             modifier = Modifier.fillMaxWidth(),
         )
     }

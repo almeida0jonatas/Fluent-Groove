@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.PictureInPictureAlt
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,9 +33,11 @@ import com.example.ui.theme.FgText
 @Composable
 fun TopAcrylicBar(
     acrylicDensity: AcrylicDensity,
-    isExpandedScreen: Boolean,
-    onOpenMenu: () -> Unit,
-    onEnterMiniPlayer: () -> Unit,
+    canNavigateBack: Boolean,
+    isSettingsActive: Boolean,
+    onNavigateBack: () -> Unit,
+    onOpenHome: () -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -52,14 +55,14 @@ fun TopAcrylicBar(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (!isExpandedScreen) {
+                if (canNavigateBack) {
                     IconButton(
-                        onClick = onOpenMenu,
-                        modifier = Modifier.testTag("open_menu_button"),
+                        onClick = onNavigateBack,
+                        modifier = Modifier.testTag("top_back_button"),
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = stringResource(R.string.cd_open_menu),
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_back),
                             tint = FgText,
                             modifier = Modifier.size(22.dp),
                         )
@@ -69,20 +72,27 @@ fun TopAcrylicBar(
                     text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
                     color = FgText,
-                    modifier = Modifier.padding(start = if (isExpandedScreen) 14.dp else 4.dp),
+                    modifier = Modifier
+                        .clickable(onClick = onOpenHome)
+                        .padding(
+                            start = if (canNavigateBack) 4.dp else 14.dp,
+                            end = 8.dp,
+                            top = 8.dp,
+                            bottom = 8.dp,
+                        ),
                 )
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            if (!isSettingsActive) {
                 IconButton(
-                    onClick = onEnterMiniPlayer,
-                    modifier = Modifier.testTag("top_mini_player_button"),
+                    onClick = onOpenSettings,
+                    modifier = Modifier.testTag("top_settings_button"),
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.PictureInPictureAlt,
-                        contentDescription = stringResource(R.string.cd_mini_player),
+                        imageVector = Icons.Outlined.Settings,
+                        contentDescription = stringResource(R.string.cd_settings),
                         tint = FgText,
-                        modifier = Modifier.size(19.dp),
+                        modifier = Modifier.size(21.dp),
                     )
                 }
             }
@@ -95,3 +105,4 @@ fun TopAcrylicBar(
         )
     }
 }
+

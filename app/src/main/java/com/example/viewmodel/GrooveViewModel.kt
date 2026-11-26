@@ -422,6 +422,28 @@ class GrooveViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun selectMyMusicTab(tab: MyMusicTab) {
+        _uiState.update { state ->
+            val target = ScreenRoute.MyMusic(tab)
+            if (state.route == target) return@update state
+            if (state.route is ScreenRoute.MyMusic) {
+                state.copy(route = target)
+            } else {
+                val updatedStack = (state.backStack + state.route).takeLast(20)
+                state.copy(route = target, backStack = updatedStack)
+            }
+        }
+    }
+
+    fun navigateHome() {
+        _uiState.update { state ->
+            state.copy(
+                route = ScreenRoute.MyMusic(MyMusicTab.HOME),
+                backStack = emptyList(),
+            )
+        }
+    }
+
     fun navigateBack(): Boolean {
         val state = _uiState.value
         if (state.isMiniPlayer) {
@@ -440,6 +462,12 @@ class GrooveViewModel(application: Application) : AndroidViewModel(application) 
             )
         }
         return true
+    }
+
+    fun navigateBackOr(fallback: ScreenRoute) {
+        if (!navigateBack()) {
+            _uiState.update { it.copy(route = fallback, backStack = emptyList()) }
+        }
     }
 
     fun onSearchQueryChanged(query: String) {
@@ -533,16 +561,33 @@ class GrooveViewModel(application: Application) : AndroidViewModel(application) 
     fun playAlbum(album: Album) {
         val albumTracks = _uiState.value.tracks
             .filter { it.albumId == album.id }
-            .sortedBy { it.trackNumber }
+            .sortedWith(
+                compareBy<Track> { if (it.trackNumber > 0) it.trackNumber else Int.MAX_VALUE }
+                    .thenBy { it.title.lowercase() }
+            )
         if (albumTracks.isNotEmpty()) {
             startPlaybackAt(albumTracks, 0)
         }
     }
 
     fun playArtist(artistId: String) {
-        val artistTracks = _uiState.value.tracks
+        val state = _uiState.value
+        val sortedAlbums = state.albums
             .filter { it.artistId == artistId }
-            .sortedWith(compareBy<Track> { it.album.lowercase() }.thenBy { it.trackNumber })
+            .sortedWith(
+                compareByDescending<Album> { it.year }
+                    .thenBy { it.title.lowercase() }
+            )
+        val albumOrder = sortedAlbums.withIndex().associate { (index, album) -> album.id to index }
+        val artistTracks = state.tracks
+            .filter { it.artistId == artistId }
+            .sortedWith(
+                compareBy<Track> { albumOrder[it.albumId] ?: Int.MAX_VALUE }
+                    .thenByDescending { it.year }
+                    .thenBy { it.album.lowercase() }
+                    .thenBy { if (it.trackNumber > 0) it.trackNumber else Int.MAX_VALUE }
+                    .thenBy { it.title.lowercase() }
+            )
         if (artistTracks.isNotEmpty()) {
             startPlaybackAt(artistTracks, 0)
         }
@@ -786,7 +831,15 @@ class GrooveViewModel(application: Application) : AndroidViewModel(application) 
     fun deletePlaylist(playlistId: String) {
         viewModelScope.launch {
             repository.deletePlaylist(playlistId)
-            navigateTo(ScreenRoute.MyMusic(MyMusicTab.HOME))
+            _uiState.update { state ->
+                val cleanedStack = state.backStack.filterNot {
+                    it is ScreenRoute.PlaylistDetail && it.playlistId == playlistId
+                }
+                state.copy(
+                    route = ScreenRoute.MyMusic(MyMusicTab.PLAYLISTS),
+                    backStack = cleanedStack.filterNot { it is ScreenRoute.MyMusic },
+                )
+            }
             showToast(str(R.string.toast_deleted_playlist))
         }
     }

@@ -13,6 +13,7 @@
     <string name="tab_songs">Canciones</string>
     <string name="tab_artists">Artistas</string>
     <string name="tab_albums">Álbumes</string>
+    <string name="tab_playlists">Listas</string>
     <string name="filter_all">Todo</string>
     <string name="search_placeholder">Buscar canciones, álbumes, artistas</string>
     <string name="search_no_results">Sin resultados para \"%1$s\"</string>
@@ -73,6 +74,10 @@
     <plurals name="artist_count">
         <item quantity="one">%1$d artista</item>
         <item quantity="other">%1$d artistas</item>
+    </plurals>
+    <plurals name="playlist_count">
+        <item quantity="one">%1$d lista</item>
+        <item quantity="other">%1$d listas</item>
     </plurals>
     <plurals name="play_count">
         <item quantity="one">%1$d reproducción</item>
@@ -147,6 +152,7 @@
     <string name="playlist_name_placeholder">Nombre de la lista</string>
     <string name="playlist_create_new">Crear nueva lista</string>
     <string name="playlist_none_yet">Aún no hay listas.</string>
+    <string name="playlists_empty_subtitle">Crea listas para organizar tus canciones favoritas.</string>
     <string name="playlist_rename_title">Renombrar lista</string>
     <string name="playlist_delete_title">¿Eliminar lista?</string>
     <string name="playlist_delete_message">¿Eliminar \"%1$s\"? Tus archivos de música seguirán en Mi Música.</string>
@@ -180,7 +186,7 @@
     <string name="settings_player_art_desc_artist">Muestra la foto del artista a pantalla completa en el reproductor principal</string>
     <string name="settings_player_art_desc_album">Muestra la carátula del álbum en tamaño normal centrada sobre un fondo atmosférico</string>
     <string name="settings_section_acrylic">Acrílico Fluent e Interfaz</string>
-    <string name="settings_acrylic_density">Densidad acrílica de barra lateral y superior</string>
+    <string name="settings_acrylic_density">Densidad acrílica de la barra superior</string>
     <string name="acrylic_subtle">Sutil</string>
     <string name="acrylic_standard">Estándar</string>
     <string name="acrylic_dense">Denso</string>
@@ -258,6 +264,8 @@
     <string name="cd_collapse_lyrics">Salir de pantalla completa</string>
     <string name="cd_play_album">Reproducir álbum</string>
     <string name="cd_play_artist">Reproducir artista</string>
+    <string name="cd_play_playlist">Reproducir lista</string>
+    <string name="cd_settings">Ajustes</string>
     <string name="cd_add_album_queue">Añadir álbum a la cola</string>
     <string name="cd_open_queue">Mostrar cola de reproducción</string>
     <string name="cd_close_queue">Ocultar cola de reproducción</string>

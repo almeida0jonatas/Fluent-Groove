@@ -58,6 +58,7 @@ fun MyMusicTab.labelRes(): Int = when (this) {
     MyMusicTab.SONGS -> R.string.tab_songs
     MyMusicTab.ARTISTS -> R.string.tab_artists
     MyMusicTab.ALBUMS -> R.string.tab_albums
+    MyMusicTab.PLAYLISTS -> R.string.tab_playlists
 }
 
 @StringRes
@@ -86,6 +87,9 @@ fun albumCountLabel(count: Int): String = pluralStringResource(R.plurals.album_c
 
 @Composable
 fun artistCountLabel(count: Int): String = pluralStringResource(R.plurals.artist_count, count, count)
+
+@Composable
+fun playlistCountLabel(count: Int): String = pluralStringResource(R.plurals.playlist_count, count, count)
 
 @Composable
 fun playCountLabel(count: Int): String = pluralStringResource(R.plurals.play_count, count, count)

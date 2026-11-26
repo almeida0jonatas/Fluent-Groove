@@ -30,12 +30,14 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddToQueue
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Sort
@@ -74,6 +76,7 @@ import com.example.R
 import com.example.model.Album
 import com.example.model.Artist
 import com.example.model.MyMusicTab
+import com.example.model.Playlist
 import com.example.model.RecentPlayEntry
 import com.example.model.SongSortOrder
 import com.example.model.Track
@@ -84,8 +87,10 @@ import com.example.ui.artistCountLabel
 import com.example.ui.components.AlbumArtwork
 import com.example.ui.components.ArtistAvatar
 import com.example.ui.components.JumpToLetterDialog
+import com.example.ui.components.PlaylistMosaicArtwork
 import com.example.ui.components.TrackRow
 import com.example.ui.labelRes
+import com.example.ui.playlistCountLabel
 import com.example.ui.songCountLabel
 import com.example.ui.theme.FgBorder
 import com.example.ui.theme.FgBorderStrong
@@ -105,6 +110,7 @@ fun MyMusicScreen(
     albums: List<Album>,
     artists: List<Artist>,
     tracks: List<Track>,
+    playlists: List<Playlist>,
     recentPlays: List<RecentPlayEntry>,
     songSortOrder: SongSortOrder,
     currentTrackId: String?,
@@ -116,11 +122,14 @@ fun MyMusicScreen(
     onChangeSortOrder: (SongSortOrder) -> Unit,
     onPlayAlbum: (Album) -> Unit,
     onPlayArtist: (String) -> Unit,
+    onPlayPlaylist: (List<Track>) -> Unit,
     onPlayTrack: (Track, List<Track>) -> Unit,
     onTogglePlay: () -> Unit,
     onShuffleAll: (List<Track>) -> Unit,
     onOpenAlbum: (String) -> Unit,
     onOpenArtist: (String) -> Unit,
+    onOpenPlaylist: (String) -> Unit,
+    onRequestCreatePlaylist: () -> Unit,
     onOpenRecentPlays: () -> Unit,
     onAddToQueue: (Track) -> Unit,
     onAddAlbumToQueue: (Album) -> Unit,
@@ -297,7 +306,7 @@ fun MyMusicScreen(
             }
         }
 
-        if (tracks.isEmpty()) {
+        if (tracks.isEmpty() && activeTab != MyMusicTab.PLAYLISTS) {
             EmptyLibraryState(
                 onImportFiles = onImportFiles,
                 onImportFolder = onImportFolder,
@@ -332,7 +341,7 @@ fun MyMusicScreen(
             return
         }
 
-        // Action Bar: Shuffle all + Sort (hidden on Home since Home has its own Quick Access header)
+        // Action Bar: Shuffle all + Sort / New Playlist (hidden on Home since Home has its own Quick Access header)
         if (activeTab != MyMusicTab.HOME) {
             Row(
                 modifier = Modifier
@@ -341,25 +350,48 @@ fun MyMusicScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Row(
-                    modifier = Modifier
-                        .clickable { onShuffleAll(tracks) }
-                        .padding(vertical = 6.dp, horizontal = 4.dp)
-                        .testTag("shuffle_all_button"),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Shuffle,
-                        contentDescription = null,
-                        tint = FgPrimary,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.action_shuffle_all_count, tracks.size),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = FgPrimary,
-                    )
+                if (activeTab == MyMusicTab.PLAYLISTS) {
+                    Row(
+                        modifier = Modifier
+                            .clickable(onClick = onRequestCreatePlaylist)
+                            .padding(vertical = 6.dp, horizontal = 4.dp)
+                            .testTag("new_playlist_button"),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = null,
+                            tint = FgPrimary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.action_new_playlist),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = FgPrimary,
+                        )
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .clickable { onShuffleAll(tracks) }
+                            .padding(vertical = 6.dp, horizontal = 4.dp)
+                            .testTag("shuffle_all_button"),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Shuffle,
+                            contentDescription = null,
+                            tint = FgPrimary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.action_shuffle_all_count, tracks.size),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = FgPrimary,
+                        )
+                    }
                 }
 
                 if (activeTab == MyMusicTab.SONGS) {
@@ -405,6 +437,7 @@ fun MyMusicScreen(
                         text = when (activeTab) {
                             MyMusicTab.ALBUMS -> albumCountLabel(albums.size)
                             MyMusicTab.ARTISTS -> artistCountLabel(artists.size)
+                            MyMusicTab.PLAYLISTS -> playlistCountLabel(playlists.size)
                             else -> songCountLabel(tracks.size)
                         },
                         style = MaterialTheme.typography.bodySmall,
@@ -565,7 +598,147 @@ fun MyMusicScreen(
                     }
                 }
             }
+
+            MyMusicTab.PLAYLISTS -> {
+                if (playlists.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(28.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Filled.QueueMusic,
+                                contentDescription = null,
+                                tint = FgTextMuted.copy(alpha = 0.55f),
+                                modifier = Modifier.size(52.dp),
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = stringResource(R.string.playlist_none_yet),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = FgText,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = stringResource(R.string.playlists_empty_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = FgTextMuted,
+                                textAlign = TextAlign.Center,
+                            )
+                            Spacer(modifier = Modifier.height(18.dp))
+                            Button(
+                                onClick = onRequestCreatePlaylist,
+                                shape = RectangleShape,
+                                colors = ButtonDefaults.buttonColors(containerColor = FgPrimary),
+                                modifier = Modifier.testTag("empty_new_playlist_button"),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = stringResource(R.string.action_new_playlist),
+                                    color = Color.White,
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    val trackMap = remember(tracks) { tracks.associateBy { it.id } }
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 152.dp),
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        items(playlists, key = { it.id }) { playlist ->
+                            val playlistTracks = remember(playlist.trackIds, trackMap) {
+                                playlist.trackIds.mapNotNull { trackMap[it] }
+                            }
+                            PlaylistGridCard(
+                                playlist = playlist,
+                                tracks = playlistTracks,
+                                onOpen = { onOpenPlaylist(playlist.id) },
+                                onPlay = {
+                                    if (playlistTracks.isNotEmpty()) {
+                                        onPlayPlaylist(playlistTracks)
+                                    }
+                                },
+                            )
+                        }
+                    }
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun PlaylistGridCard(
+    playlist: Playlist,
+    tracks: List<Track>,
+    onOpen: () -> Unit,
+    onPlay: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onOpen)
+            .testTag("playlist_card_${playlist.id}"),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .border(0.5.dp, FgBorder),
+        ) {
+            PlaylistMosaicArtwork(
+                tracks = tracks,
+                modifier = Modifier.fillMaxSize(),
+            )
+
+            if (tracks.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(6.dp)
+                        .size(34.dp)
+                        .background(FgPrimary)
+                        .clickable(onClick = onPlay),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.PlayArrow,
+                        contentDescription = stringResource(R.string.cd_play_playlist),
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = playlist.name,
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            color = FgText,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = songCountLabel(tracks.size),
+            style = MaterialTheme.typography.bodySmall,
+            color = FgTextMuted,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 

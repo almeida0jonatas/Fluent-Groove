@@ -24,22 +24,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloseFullscreen
 import androidx.compose.material.icons.filled.Lyrics
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -52,7 +47,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
@@ -91,76 +85,11 @@ fun LyricsPanel(
     val primaryAccent = if (darkBackdrop) FgAccentOnDark else FgPrimary
     val textPrimary = if (darkBackdrop) Color.White else FgText
     val textMuted = if (darkBackdrop) Color.White.copy(alpha = 0.65f) else FgTextMuted
-    val dividerColor = if (darkBackdrop) Color.White.copy(alpha = 0.14f) else FgBorder
 
     Column(
         modifier = modifier
             .then(if (!darkBackdrop) Modifier.background(FgSurface) else Modifier),
     ) {
-        // Header strip with status indicator + Refresh / Import .lrc / Fullscreen toggle
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            LyricsStatusBadge(
-                lyricsState = lyricsState,
-                accentColor = primaryAccent,
-                mutedColor = textMuted,
-                darkBackdrop = darkBackdrop,
-            )
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = onRefreshLyrics,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .testTag("lyrics_refresh_button"),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = stringResource(R.string.cd_refresh_lyrics),
-                        tint = textMuted,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-                IconButton(
-                    onClick = onImportLyricsFile,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .testTag("lyrics_import_button"),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.UploadFile,
-                        contentDescription = stringResource(R.string.cd_import_lyrics),
-                        tint = textMuted,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-                if (onToggleFullscreen != null) {
-                    IconButton(
-                        onClick = onToggleFullscreen,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .testTag("lyrics_fullscreen_toggle"),
-                    ) {
-                        Icon(
-                            imageVector = if (isFullscreen) Icons.Filled.CloseFullscreen else Icons.Filled.OpenInFull,
-                            contentDescription = stringResource(
-                                if (isFullscreen) R.string.cd_collapse_lyrics else R.string.cd_expand_lyrics
-                            ),
-                            tint = textMuted,
-                            modifier = Modifier.size(19.dp),
-                        )
-                    }
-                }
-            }
-        }
-
-        HorizontalDivider(color = dividerColor)
-
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -292,54 +221,6 @@ fun LyricsPanel(
 }
 
 @Composable
-private fun LyricsStatusBadge(
-    lyricsState: LyricsUiState,
-    accentColor: Color,
-    mutedColor: Color,
-    darkBackdrop: Boolean,
-) {
-    val (label, isSynced) = when (lyricsState) {
-        is LyricsUiState.Loaded -> {
-            val l = lyricsState.lyrics
-            when {
-                l.hasSyncedLyrics -> stringResource(R.string.lyrics_synced_source, l.source) to true
-                l.isInstrumental -> stringResource(R.string.lyrics_instrumental_source, l.source) to false
-                else -> stringResource(R.string.lyrics_plain_source, l.source) to false
-            }
-        }
-        is LyricsUiState.Loading -> stringResource(R.string.lyrics_searching) to false
-        else -> stringResource(R.string.lyrics_label) to false
-    }
-
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        if (isSynced) {
-            Box(
-                modifier = Modifier
-                    .size(7.dp)
-                    .clip(CircleShape)
-                    .background(accentColor),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-        } else {
-            Icon(
-                imageVector = Icons.Filled.Lyrics,
-                contentDescription = null,
-                tint = mutedColor,
-                modifier = Modifier.size(16.dp),
-            )
-            Spacer(modifier = Modifier.width(7.dp))
-        }
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = if (isSynced) FontWeight.SemiBold else FontWeight.Medium,
-            ),
-            color = if (isSynced) accentColor else if (darkBackdrop) Color.White.copy(alpha = 0.85f) else mutedColor,
-        )
-    }
-}
-
-@Composable
 private fun SyncedLyricsView(
     lyrics: TrackLyrics,
     elapsedMs: Long,
@@ -401,18 +282,6 @@ private fun SyncedLyricsView(
                         autoScrollEnabled = true
                         onSeekToMs(line.timeMs)
                     },
-                )
-            }
-
-            item {
-                Text(
-                    text = stringResource(R.string.lyrics_tap_to_seek),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (darkBackdrop) Color.White.copy(alpha = 0.45f) else FgTextMuted.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 24.dp, bottom = 8.dp),
                 )
             }
         }

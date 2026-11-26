@@ -13,6 +13,7 @@
     <string name="tab_songs">Songs</string>
     <string name="tab_artists">Artists</string>
     <string name="tab_albums">Albums</string>
+    <string name="tab_playlists">Playlists</string>
     <string name="filter_all">All</string>
     <string name="search_placeholder">Search songs, albums, artists</string>
     <string name="search_no_results">No results found for \"%1$s\"</string>
@@ -73,6 +74,10 @@
     <plurals name="artist_count">
         <item quantity="one">%1$d artist</item>
         <item quantity="other">%1$d artists</item>
+    </plurals>
+    <plurals name="playlist_count">
+        <item quantity="one">%1$d playlist</item>
+        <item quantity="other">%1$d playlists</item>
     </plurals>
     <plurals name="play_count">
         <item quantity="one">%1$d play</item>
@@ -147,6 +152,7 @@
     <string name="playlist_name_placeholder">Playlist name</string>
     <string name="playlist_create_new">Create new playlist</string>
     <string name="playlist_none_yet">No playlists yet.</string>
+    <string name="playlists_empty_subtitle">Create playlists to organize your favorite songs.</string>
     <string name="playlist_rename_title">Rename playlist</string>
     <string name="playlist_delete_title">Delete playlist?</string>
     <string name="playlist_delete_message">Delete \"%1$s\"? Your music files will remain in My Music.</string>
@@ -180,7 +186,7 @@
     <string name="settings_player_art_desc_artist">Display the artist photo edge-to-edge across the full player screen</string>
     <string name="settings_player_art_desc_album">Display the album artwork centered at normal size over an atmospheric backdrop</string>
     <string name="settings_section_acrylic">Fluent Acrylic &amp; Interface</string>
-    <string name="settings_acrylic_density">Sidebar &amp; Header Acrylic Density</string>
+    <string name="settings_acrylic_density">Header Acrylic Density</string>
     <string name="acrylic_subtle">Subtle</string>
     <string name="acrylic_standard">Standard</string>
     <string name="acrylic_dense">Dense</string>
@@ -258,6 +264,8 @@
     <string name="cd_collapse_lyrics">Exit fullscreen lyrics</string>
     <string name="cd_play_album">Play album</string>
     <string name="cd_play_artist">Play artist</string>
+    <string name="cd_play_playlist">Play playlist</string>
+    <string name="cd_settings">Settings</string>
     <string name="cd_add_album_queue">Add album to queue</string>
     <string name="cd_open_queue">Show play queue</string>
     <string name="cd_close_queue">Hide play queue</string>

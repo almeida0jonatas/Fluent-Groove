@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,13 +19,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Slim minimalist Groove Music seekbar shared across the main Now Playing player,
- * fullscreen synced lyrics view, and Mini Player: hairline translucent track,
- * crisp white active fill, and pure white circular thumb.
+ * Slim minimalist Groove Music slider shared across the main Now Playing player,
+ * fullscreen synced lyrics view, Mini Player, PlayerBar, and Equalizer controls:
+ * hairline track, crisp active fill, and clean circular thumb.
  */
 @Composable
 fun GrooveSeekBar(
@@ -35,41 +38,54 @@ fun GrooveSeekBar(
     onScrubEnd: (Float) -> Unit,
     modifier: Modifier = Modifier,
     seekBarTestTag: String = "np_seek_bar",
+    activeTrackColor: Color = Color.White.copy(alpha = 0.90f),
+    inactiveTrackColor: Color = Color.White.copy(alpha = 0.34f),
+    thumbColor: Color = Color.White,
+    barHeight: Dp = 36.dp,
 ) {
     var widthPx by remember { mutableFloatStateOf(1f) }
     var lastFraction by remember { mutableFloatStateOf(progress) }
+    val currentOnScrubStartOrMove by rememberUpdatedState(onScrubStartOrMove)
+    val currentOnScrubEnd by rememberUpdatedState(onScrubEnd)
+    val density = LocalDensity.current
+    val thumbInsetPx = with(density) { 8.5.dp.toPx() }
+
+    fun fractionForX(x: Float): Float {
+        val usableWidth = (widthPx - thumbInsetPx * 2f).coerceAtLeast(1f)
+        return ((x - thumbInsetPx) / usableWidth).coerceIn(0f, 1f)
+    }
 
     Box(
         modifier = modifier
-            .height(36.dp)
+            .height(barHeight)
             .onSizeChanged { widthPx = it.width.toFloat().coerceAtLeast(1f) }
-            .pointerInput(enabled) {
+            .pointerInput(enabled, thumbInsetPx) {
                 if (!enabled) return@pointerInput
                 detectTapGestures { offset ->
-                    val frac = (offset.x / widthPx).coerceIn(0f, 1f)
+                    val frac = fractionForX(offset.x)
                     lastFraction = frac
-                    onScrubEnd(frac)
+                    currentOnScrubEnd(frac)
                 }
             }
-            .pointerInput(enabled) {
+            .pointerInput(enabled, thumbInsetPx) {
                 if (!enabled) return@pointerInput
                 detectHorizontalDragGestures(
                     onDragStart = { offset ->
-                        val frac = (offset.x / widthPx).coerceIn(0f, 1f)
+                        val frac = fractionForX(offset.x)
                         lastFraction = frac
-                        onScrubStartOrMove(frac)
+                        currentOnScrubStartOrMove(frac)
                     },
                     onHorizontalDrag = { change, _ ->
                         change.consume()
-                        val frac = (change.position.x / widthPx).coerceIn(0f, 1f)
+                        val frac = fractionForX(change.position.x)
                         lastFraction = frac
-                        onScrubStartOrMove(frac)
+                        currentOnScrubStartOrMove(frac)
                     },
                     onDragEnd = {
-                        onScrubEnd(lastFraction)
+                        currentOnScrubEnd(lastFraction)
                     },
                     onDragCancel = {
-                        onScrubEnd(lastFraction)
+                        currentOnScrubEnd(lastFraction)
                     },
                 )
             }
@@ -87,7 +103,7 @@ fun GrooveSeekBar(
 
             // Inactive track
             drawLine(
-                color = Color.White.copy(alpha = 0.34f),
+                color = inactiveTrackColor,
                 start = Offset(startX, centerY),
                 end = Offset(endX, centerY),
                 strokeWidth = trackHeight,
@@ -97,7 +113,7 @@ fun GrooveSeekBar(
             // Active track
             if (thumbX > startX) {
                 drawLine(
-                    color = Color.White.copy(alpha = 0.90f),
+                    color = activeTrackColor,
                     start = Offset(startX, centerY),
                     end = Offset(thumbX, centerY),
                     strokeWidth = trackHeight,
@@ -105,10 +121,10 @@ fun GrooveSeekBar(
                 )
             }
 
-            // Pure white circular thumb
+            // Circular thumb
             if (enabled) {
                 drawCircle(
-                    color = Color.White,
+                    color = thumbColor,
                     radius = thumbRadius,
                     center = Offset(thumbX, centerY),
                 )
